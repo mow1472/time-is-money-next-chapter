@@ -1,0 +1,121 @@
+<!-- EYARC-styled "calculator display" graphic — HP 10bII+ TVM step (discount lump sum back) -->
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;0,800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+  :root{
+    --navy:#002E5D; --blue:#0d65c7; --lightblue:#B5E2FA;
+    --yellow:#FFE600; --gold:#F2BA05;
+    --gray1:#EAEAF1; --gray2:#C2C2CE; --gray3:#747480;
+    --mono:'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    --sans:'Open Sans', Arial, sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:var(--sans); background:#F2F3F7;
+    display:flex; justify-content:center; padding:40px 24px; min-height:100vh;
+  }
+  .wrap{ width:100%; max-width:780px; }
+
+  .frame{
+    border:1px solid #000; border-radius:14px; overflow:hidden; background:var(--navy);
+    box-shadow:0 18px 40px -18px rgba(0,46,93,.55);
+  }
+  .bar{ padding:16px 22px; background:var(--navy); border-bottom:3px solid var(--yellow);
+    display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+  .bar h1{ font-weight:800; font-size:16px; letter-spacing:.3px; color:#fff; }
+  .bar .step{
+    font-family:var(--mono); font-size:11px; font-weight:700; color:var(--navy);
+    background:var(--yellow); padding:5px 11px; border-radius:6px; white-space:nowrap;
+  }
+
+  .screen{ position:relative; background:var(--navy); padding:10px 0 16px; }
+  .screen::after{
+    content:""; position:absolute; inset:0;
+    background:repeating-linear-gradient(to bottom, rgba(255,255,255,.025) 0px, rgba(255,255,255,.025) 1px, transparent 1px, transparent 3px);
+    pointer-events:none;
+  }
+  .head{
+    display:grid; grid-template-columns:230px 1fr; gap:18px; padding:8px 24px 10px;
+    font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+    color:var(--gray2); border-bottom:1px solid rgba(181,226,250,.18);
+  }
+  .row{
+    display:grid; grid-template-columns:230px 1fr; gap:18px; align-items:baseline;
+    padding:9px 24px; border-bottom:1px solid rgba(181,226,250,.10);
+    opacity:0; transform:translateY(6px); animation:reveal .42s ease forwards;
+  }
+  .row:last-child{border-bottom:none;}
+  .keys{ font-family:var(--mono); font-size:14px; font-weight:500; color:#fff; white-space:pre; line-height:1.4; }
+  .keys .cmd{color:var(--yellow); font-weight:700;}
+  .keys .shift{color:var(--gold); font-weight:700;}
+  .keys .num{color:#fff;}
+  .ann{ font-family:var(--mono); font-size:13.5px; line-height:1.45; color:var(--lightblue); }
+  .ann.desc{ color:var(--gray2); font-style:italic; }
+  .ann .note{ color:var(--gray2); font-style:italic; font-size:12px; }
+  .row.result{
+    background:rgba(255,230,0,.10); border-top:1px solid rgba(255,230,0,.45);
+    border-bottom:none; padding-top:14px; padding-bottom:16px;
+  }
+  .row.result .ann{ color:var(--yellow); font-weight:700; font-size:16px; }
+  @keyframes reveal{ to{opacity:1; transform:translateY(0);} }
+
+  .tip{
+    display:flex; gap:12px; align-items:flex-start; background:#fff;
+    border-top:1px solid var(--gray1); padding:14px 22px;
+  }
+  .tip .mark{
+    flex:none; width:26px; height:26px; border-radius:6px; background:var(--yellow);
+    color:var(--navy); font-weight:800; font-size:15px;
+    display:flex; align-items:center; justify-content:center; margin-top:1px;
+  }
+  .tip p{ font-size:13px; line-height:1.5; color:var(--navy); }
+  .tip p b{font-weight:700;}
+  .tip code{ font-family:var(--mono); font-size:12px; background:var(--gray1); color:var(--navy); padding:1px 5px; border-radius:4px; }
+</style>
+
+<div class="wrap">
+  <div class="frame">
+    <div class="bar">
+      <h1>Discounting a Lump Sum Back &mdash; HP 10bII+</h1>
+      <div class="step">Step 2 &middot; Discount to PV</div>
+    </div>
+
+    <div class="screen">
+      <div class="head">
+        <div class="a">Keystrokes</div>
+        <div class="b">What you see / why</div>
+      </div>
+      <div id="rows"></div>
+    </div>
+
+    <div class="tip">
+      <div class="mark">!</div>
+      <p><b>Why the answer is negative:</b> the HP follows a <b>cash-flow sign convention</b> &mdash; money in and money out carry opposite signs. Since the future value was entered as a positive inflow, the calculator returns the present value as a negative <code>&minus;15,270.61</code>, meaning the amount you&rsquo;d pay (an outflow) today. Read it as a present value of <b>$15,270.61</b>.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const rows = [
+    { keys:'<span class="shift">&#9670;</span> <span class="cmd">C ALL</span>',                            ann:'clears the TVM registers', desc:true },
+    { keys:'<span class="num">3</span>          <span class="cmd">N</span>',     ann:'N = 3', note:'3 years back to today' },
+    { keys:'<span class="num">8</span>          <span class="cmd">I/YR</span>',  ann:'I/YR = 8%' },
+    { keys:'<span class="num">0</span>          <span class="cmd">PMT</span>',   ann:'PMT = 0', note:'no payments in between' },
+    { keys:'<span class="num">19236.57</span>   <span class="cmd">FV</span>',     ann:'FV = 19,236.57', note:'the NPV we just found' },
+    { keys:'<span class="cmd">CPT</span> <span class="cmd">PV</span>',             ann:'PV = \u221215,270.61', result:true },
+  ];
+
+  const host = document.getElementById('rows');
+  rows.forEach((r, i) => {
+    const div = document.createElement('div');
+    div.className = 'row' + (r.result ? ' result' : '');
+    div.style.animationDelay = (0.12 + i * 0.10) + 's';
+    const annClass = 'ann' + (r.desc ? ' desc' : '');
+    const note = r.note ? ' <span class="note">(' + r.note + ')</span>' : '';
+    div.innerHTML =
+      '<div class="keys">' + r.keys + '</div>' +
+      '<div class="' + annClass + '">' + r.ann + note + '</div>';
+    host.appendChild(div);
+  });
+</script>
