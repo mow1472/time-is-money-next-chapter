@@ -1,0 +1,107 @@
+<!-- EYARC-styled table — early vs late amortization, side section labels -->
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;0,800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+  :root{
+    --navy:#002E5D; --blue:#0d65c7; --lightblue:#B5E2FA;
+    --yellow:#FFE600; --gold:#F2BA05; --green:#6E9600;
+    --gray1:#EAEAF1; --gray2:#C2C2CE; --gray3:#747480;
+    --mono:'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+    --sans:'Open Sans', Arial, sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:var(--sans); background:#F2F3F7;
+    display:flex; justify-content:center; padding:40px 24px; min-height:100vh; }
+  .wrap{ width:100%; max-width:800px; }
+  .frame{ border:1px solid #000; border-radius:14px; overflow:hidden; background:#fff;
+    box-shadow:0 18px 40px -18px rgba(0,46,93,.55); }
+
+  .bar{ padding:16px 22px; background:var(--navy); border-bottom:3px solid var(--yellow);
+    display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+  .bar h1{ font-weight:800; font-size:16px; color:#fff; letter-spacing:.3px; }
+  .bar .sub{ font-size:12px; font-weight:600; color:var(--lightblue); }
+
+  .tablewrap{ padding:14px 20px 6px; }
+
+  /* per-section block: left label + table */
+  .section{ display:flex; gap:14px; align-items:stretch; }
+  .section + .section{ margin-top:22px; padding-top:18px; border-top:1px solid var(--gray1); }
+  .sidelabel{ flex:none; width:104px; padding-top:30px; }
+  .sidelabel .ttl{ font-size:15px; font-weight:800; color:var(--navy); line-height:1.25; }
+  .sidelabel .rng{ display:block; font-size:12px; font-weight:600; color:var(--gray3); margin-top:3px; }
+
+  .secttable{ flex:1; min-width:0; }
+  table{ border-collapse:collapse; width:100%; table-layout:fixed; }
+  thead th{ font-size:12px; font-weight:800; color:var(--navy); letter-spacing:.4px;
+    text-transform:uppercase; padding:7px 10px 8px; text-align:right;
+    border-bottom:2px solid var(--navy); white-space:nowrap; }
+  thead th.lft{ text-align:left; }
+
+  tbody td{ font-family:var(--mono); font-size:14px; color:var(--navy);
+    padding:9px 10px; text-align:right; border-bottom:1px solid var(--gray1); font-variant-numeric:tabular-nums; }
+  td.month{ text-align:left; font-weight:700; font-family:var(--sans); }
+  tbody tr:last-child td{ border-bottom:none; }
+  tr.payoff td{ background:rgba(110,150,0,.10); }
+  tr.payoff td.month{ font-weight:800; }
+
+  .tip{ display:flex; gap:12px; align-items:flex-start; background:#fff;
+    border-top:1px solid var(--gray1); padding:14px 22px; margin-top:8px; }
+  .tip .mark{ flex:none; width:26px; height:26px; border-radius:6px; background:var(--yellow);
+    color:var(--navy); font-weight:800; font-size:15px; display:flex; align-items:center; justify-content:center; margin-top:1px; }
+  .tip p{ font-size:13px; line-height:1.5; color:var(--navy); }
+  .tip p b{ font-weight:700; }
+</style>
+
+<div class="wrap">
+  <div class="frame">
+    <div class="bar">
+      <h1>Amortization &mdash; Early vs. Late Payments</h1>
+      <div class="sub">$400,000 &middot; 5.5% &middot; 30 yr</div>
+    </div>
+
+    <div class="tablewrap">
+
+      <div class="section">
+        <div class="sidelabel">
+          <span class="ttl">Early payments</span>
+          <span class="rng">(months 1&ndash;5)</span>
+        </div>
+        <div class="secttable">
+          <table>
+            <colgroup><col style="width:9%"><col style="width:21%"><col style="width:17%"><col style="width:17%"><col style="width:17%"><col style="width:19%"></colgroup>
+            <thead><tr><th class="lft">Month</th><th>Beginning</th><th>Payment</th><th>Interest</th><th>Principal</th><th>Ending</th></tr></thead>
+            <tbody>
+              <tr><td class="month">1</td><td>400,000.00</td><td>2,271.16</td><td>1,833.33</td><td>437.83</td><td>399,562.17</td></tr>
+              <tr><td class="month">2</td><td>399,562.17</td><td>2,271.16</td><td>1,831.33</td><td>439.83</td><td>399,122.34</td></tr>
+              <tr><td class="month">3</td><td>399,122.34</td><td>2,271.16</td><td>1,829.31</td><td>441.85</td><td>398,680.49</td></tr>
+              <tr><td class="month">4</td><td>398,680.49</td><td>2,271.16</td><td>1,827.28</td><td>443.88</td><td>398,236.61</td></tr>
+              <tr><td class="month">5</td><td>398,236.61</td><td>2,271.16</td><td>1,825.25</td><td>445.91</td><td>397,790.70</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sidelabel">
+          <span class="ttl">Late payments</span>
+          <span class="rng">(months 356&ndash;360)</span>
+        </div>
+        <div class="secttable">
+          <table>
+            <colgroup><col style="width:9%"><col style="width:21%"><col style="width:17%"><col style="width:17%"><col style="width:17%"><col style="width:19%"></colgroup>
+            <thead><tr><th class="lft">Month</th><th>Beginning</th><th>Payment</th><th>Interest</th><th>Principal</th><th>Ending</th></tr></thead>
+            <tbody>
+              <tr><td class="month">356</td><td>11,201.29</td><td>2,271.16</td><td>51.34</td><td>2,219.82</td><td>8,981.48</td></tr>
+              <tr><td class="month">357</td><td>8,981.48</td><td>2,271.16</td><td>41.17</td><td>2,229.99</td><td>6,751.49</td></tr>
+              <tr><td class="month">358</td><td>6,751.49</td><td>2,271.16</td><td>30.94</td><td>2,240.21</td><td>4,511.27</td></tr>
+              <tr><td class="month">359</td><td>4,511.27</td><td>2,271.16</td><td>20.68</td><td>2,250.48</td><td>2,260.79</td></tr>
+              <tr class="payoff"><td class="month">360</td><td>2,260.79</td><td>2,271.15</td><td>10.36</td><td>2,260.79</td><td>0.00</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
