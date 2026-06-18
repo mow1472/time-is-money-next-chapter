@@ -1,0 +1,180 @@
+<!-- EYARC-styled graphic — amortization stacked bars with hover tooltips -->
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;0,800&display=swap');
+  :root{
+    --navy:#002E5D; --blue:#0d65c7; --lightblue:#B5E2FA;
+    --yellow:#FFE600; --gold:#F2BA05;
+    --gray1:#EAEAF1; --gray2:#C2C2CE; --gray3:#747480;
+    --sans:'Open Sans', Arial, sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:var(--sans); background:#F2F3F7;
+    display:flex; justify-content:center; padding:40px 24px; min-height:100vh; }
+  .wrap{ width:100%; max-width:780px; }
+  .frame{ border:1px solid #000; border-radius:14px; overflow:hidden; background:#fff;
+    box-shadow:0 18px 40px -18px rgba(0,46,93,.55); }
+
+  .bar-t{ padding:16px 22px; background:var(--navy); border-bottom:3px solid var(--yellow);
+    display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+  .bar-t h1{ font-weight:800; font-size:16px; color:#fff; letter-spacing:.3px; }
+  .bar-t .sub{ font-size:12px; font-weight:600; color:var(--lightblue); }
+
+  .chartwrap{ padding:20px 18px 6px; position:relative; }
+
+  .legend{ display:flex; gap:22px; justify-content:center; margin:2px 0 6px; flex-wrap:wrap; }
+  .legend span{ display:inline-flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700; color:var(--navy); }
+  .swatch{ width:14px; height:14px; border-radius:3px; display:inline-block; }
+
+  svg{ width:100%; height:auto; display:block; }
+  .yrlabel{ font-family:var(--sans); font-size:12px; font-weight:700; fill:var(--navy); transition:fill .12s; }
+  .yrlabel.hot{ fill:var(--blue); }
+  .axisttl{ font-family:var(--sans); font-size:11px; font-weight:700; fill:var(--gray3); letter-spacing:.5px; }
+  .calloutbox{ fill:#fff; stroke:var(--gray2); stroke-width:1; }
+  .callout-l1{ font-family:var(--sans); font-size:11px; font-weight:800; }
+  .callout-l2{ font-family:var(--sans); font-size:10.5px; font-weight:600; }
+  .hit{ fill:transparent; cursor:pointer; }
+  .seg{ transition:opacity .12s; }
+  .seg.dim{ opacity:.45; }
+
+  /* tooltip */
+  .tt{
+    position:absolute; pointer-events:none; z-index:5;
+    background:var(--navy); color:#fff; border-radius:9px;
+    padding:9px 12px; min-width:150px;
+    box-shadow:0 10px 26px -8px rgba(0,46,93,.6);
+    opacity:0; transform:translateY(4px); transition:opacity .12s, transform .12s;
+    border-top:3px solid var(--yellow);
+  }
+  .tt.show{ opacity:1; transform:translateY(0); }
+  .tt .ttyr{ font-size:12px; font-weight:800; margin-bottom:6px; }
+  .tt .ttrow{ display:flex; align-items:center; justify-content:space-between; gap:14px; font-size:12px; margin:2px 0; }
+  .tt .ttkey{ display:inline-flex; align-items:center; gap:6px; color:var(--lightblue); font-weight:600; }
+  .tt .ttkey i{ width:10px; height:10px; border-radius:2px; display:inline-block; }
+  .tt .ttval{ font-weight:700; font-variant-numeric:tabular-nums; }
+  .tt .ttpct{ font-size:10.5px; color:var(--gray2); margin-left:5px; font-weight:600; }
+  .tt .tttot{ border-top:1px solid rgba(181,226,250,.25); margin-top:6px; padding-top:5px; font-size:11px; color:var(--gray2); display:flex; justify-content:space-between; }
+
+  .tip{ display:flex; gap:12px; align-items:flex-start; background:#fff;
+    border-top:1px solid var(--gray1); padding:14px 22px; }
+  .tip .mark{ flex:none; width:26px; height:26px; border-radius:6px; background:var(--yellow);
+    color:var(--navy); font-weight:800; font-size:15px; display:flex; align-items:center; justify-content:center; margin-top:1px; }
+  .tip p{ font-size:13px; line-height:1.5; color:var(--navy); }
+  .tip p b{ font-weight:700; }
+</style>
+
+<div class="wrap">
+  <div class="frame">
+    <div class="bar-t">
+      <h1>Where Each Payment Goes Over Time</h1>
+      <div class="sub">Fixed payment &asymp; $27,254 / yr</div>
+    </div>
+
+    <div class="chartwrap">
+      <div class="legend">
+        <span><span class="swatch" style="background:#B5E2FA;"></span>Interest</span>
+        <span><span class="swatch" style="background:#002E5D;"></span>Principal</span>
+      </div>
+      <svg id="chart" viewBox="0 0 760 440" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Stacked bar chart of interest versus principal by year"></svg>
+      <div class="tt" id="tt"></div>
+    </div>
+
+    <div class="tip">
+      <div class="mark">!</div>
+      <p>The <b>payment stays the same</b> every year, but its makeup flips. Early on, most of it is <b>interest</b> (light) because the balance is large; as the balance shrinks, more of each payment chips away at <b>principal</b> (dark). <b>Hover any bar</b> to see its exact split.</p>
+    </div>
+
+    <div class="tip" style="border-top:1px solid var(--gray1);">
+      <div class="mark">+</div>
+      <p>When you <b>pay more than the minimum</b>, that extra goes straight to <b>principal</b> rather than interest &mdash; shrinking the balance faster, so you pay the loan off sooner and at a <b>lower total cost</b>.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  var data = [
+    { yr:1,  interest:21900, principal:5354,  label:['~$21,900 interest','~$5,400 principal'], anchor:'left' },
+    { yr:3,  interest:21286, principal:5968 },
+    { yr:5,  interest:20603, principal:6651 },
+    { yr:10, interest:18530, principal:8724 },
+    { yr:15, interest:15812, principal:11442 },
+    { yr:20, interest:12247, principal:15007 },
+    { yr:25, interest:7572,  principal:19682 },
+    { yr:30, interest:800,   principal:26454, label:['~$800 interest','~$26,500 principal'], anchor:'right' }
+  ];
+
+  var W=760, H=440, topPad=70, baseline=340, maxH=baseline-topPad;
+  var total=27254, leftPad=58, rightPad=24, plotW=W-leftPad-rightPad, n=data.length, slot=plotW/n, bw=46;
+  var NAVY='#002E5D', LIGHT='#B5E2FA';
+  var svg=document.getElementById('chart');
+  var ns='http://www.w3.org/2000/svg';
+  function el(t,a){ var e=document.createElementNS(ns,t); for(var k in a) e.setAttribute(k,a[k]); return e; }
+  function money(v){ return '$'+Math.round(v).toLocaleString('en-US'); }
+
+  var callouts=[], bars=[];
+
+  data.forEach(function(d,i){
+    var cx=leftPad+slot*i+slot/2, x=cx-bw/2;
+    var pH=(d.principal/total)*maxH, iH=(d.interest/total)*maxH;
+    var pY=baseline-pH, iY=pY-iH;
+
+    var rectP=el('rect',{x:x,y:pY,width:bw,height:pH,fill:NAVY,'class':'seg'});
+    var pathI=el('path',{d:'M'+x+' '+(iY+6)+' q0 -6 6 -6 h'+(bw-12)+' q6 0 6 6 v'+(iH-6)+' h'+(-bw)+' z', fill:LIGHT,'class':'seg'});
+    svg.appendChild(rectP); svg.appendChild(pathI);
+    svg.appendChild(el('line',{x1:x,y1:pY,x2:x+bw,y2:pY,stroke:'#fff','stroke-width':1.5}));
+
+    var yl=el('text',{x:cx,y:baseline+22,'text-anchor':'middle','class':'yrlabel'});
+    yl.textContent='Yr '+d.yr; svg.appendChild(yl);
+
+    bars.push({d:d,cx:cx,iY:iY,segP:rectP,segI:pathI,yl:yl});
+    if(d.label){ callouts.push({d:d,cx:cx,barTop:iY}); }
+  });
+
+  svg.appendChild(el('line',{x1:leftPad-6,y1:baseline,x2:W-rightPad,y2:baseline,stroke:'#C2C2CE','stroke-width':1.5}));
+  var cap=el('text',{x:leftPad-6,y:topPad-16,'class':'axisttl'}); cap.textContent='Annual payment (split)'; svg.appendChild(cap);
+  var xcap=el('text',{x:W/2,y:baseline+48,'text-anchor':'middle','class':'axisttl'}); xcap.textContent='MILESTONE YEAR'; svg.appendChild(xcap);
+
+  // persistent anchor callouts removed — hover tooltips cover every bar
+
+  // ---- hover layer (drawn last, full-height transparent hit areas) ----
+  var tt=document.getElementById('tt');
+  var chartwrap=svg.parentNode;
+
+  function showTip(b, evt){
+    var d=b.d;
+    var ip=Math.round(d.interest/total*100), pp=100-ip;
+    tt.innerHTML=
+      '<div class="ttyr">Year '+d.yr+'</div>'+
+      '<div class="ttrow"><span class="ttkey"><i style="background:#B5E2FA"></i>Interest</span>'+
+        '<span class="ttval">'+money(d.interest)+'<span class="ttpct">'+ip+'%</span></span></div>'+
+      '<div class="ttrow"><span class="ttkey"><i style="background:#002E5D"></i>Principal</span>'+
+        '<span class="ttval">'+money(d.principal)+'<span class="ttpct">'+pp+'%</span></span></div>'+
+      '<div class="tttot"><span>Payment</span><span>'+money(total)+'</span></div>';
+    tt.classList.add('show');
+    moveTip(evt);
+    b.segP.classList.remove('dim'); b.segI.classList.remove('dim');
+    b.yl.classList.add('hot');
+    bars.forEach(function(o){ if(o!==b){ o.segP.classList.add('dim'); o.segI.classList.add('dim'); } });
+  }
+  function moveTip(evt){
+    var host=chartwrap.getBoundingClientRect();
+    var x=evt.clientX-host.left, y=evt.clientY-host.top;
+    var tw=tt.offsetWidth, th=tt.offsetHeight;
+    var nx=x+14; if(nx+tw>host.width) nx=x-tw-14; if(nx<4) nx=4;
+    var ny=y-th-10; if(ny<4) ny=y+18;
+    tt.style.left=nx+'px'; tt.style.top=ny+'px';
+  }
+  function hideTip(){
+    tt.classList.remove('show');
+    bars.forEach(function(o){ o.segP.classList.remove('dim'); o.segI.classList.remove('dim'); o.yl.classList.remove('hot'); });
+  }
+
+  bars.forEach(function(b){
+    var x=b.cx-slot/2;
+    var hit=el('rect',{x:x,y:topPad-10,width:slot,height:baseline-(topPad-10),'class':'hit'});
+    hit.addEventListener('mouseenter',function(e){ showTip(b,e); });
+    hit.addEventListener('mousemove',function(e){ moveTip(e); });
+    hit.addEventListener('mouseleave',hideTip);
+    svg.appendChild(hit);
+  });
+</script>
