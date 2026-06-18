@@ -1,0 +1,254 @@
+<!-- EYARC-styled Excel workbook — PMT/IPMT/PPMT + full first-5-year schedule -->
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;0,800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+  :root{
+    --navy:#002E5D; --blue:#0d65c7; --lightblue:#B5E2FA;
+    --yellow:#FFE600; --gold:#F2BA05; --green:#6E9600;
+    --gray1:#EAEAF1; --gray2:#C2C2CE; --gray3:#747480; --grid:#D4D4DE;
+    --mono:'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    --sans:'Open Sans', Arial, sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:var(--sans); background:#F2F3F7;
+    display:flex; justify-content:center; padding:40px 24px; min-height:100vh; }
+  .wrap{ width:100%; max-width:780px; }
+  .frame{ border:1px solid #000; border-radius:14px; overflow:hidden; background:#fff;
+    box-shadow:0 18px 40px -18px rgba(0,46,93,.55); }
+
+  .bar{ padding:16px 22px; background:var(--navy); border-bottom:3px solid var(--yellow);
+    display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+  .bar h1{ font-weight:800; font-size:16px; color:#fff; letter-spacing:.3px; }
+  .bar .badge{ font-family:var(--mono); font-size:11px; font-weight:700; color:var(--navy);
+    background:var(--yellow); padding:5px 11px; border-radius:6px; white-space:nowrap; }
+
+  .fbar{ display:flex; align-items:stretch; background:#fff; border-bottom:1px solid var(--grid); height:34px; }
+  .namebox{ width:74px; flex:none; display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:12px; font-weight:700; color:var(--navy);
+    background:var(--gray1); border-right:1px solid var(--grid); }
+  .fx{ width:40px; flex:none; display:flex; align-items:center; justify-content:center;
+    font-style:italic; font-weight:700; font-size:13px; color:var(--gray3); border-right:1px solid var(--grid); }
+  .formula{ flex:1; display:flex; align-items:center; padding:0 12px;
+    font-family:var(--mono); font-size:12.5px; font-weight:500; color:var(--navy);
+    user-select:all; overflow-x:auto; white-space:nowrap; }
+  .copy{ flex:none; align-self:center; margin-right:8px; border:none; cursor:pointer;
+    font-family:var(--sans); font-size:11px; font-weight:700; color:var(--navy);
+    background:var(--yellow); padding:5px 11px; border-radius:6px; transition:background .15s; }
+  .copy:hover{ background:var(--gold); } .copy.done{ background:var(--green); color:#fff; }
+
+  .sheet{ display:none; } .sheet.active{ display:block; }
+
+  table{ border-collapse:collapse; width:100%; table-layout:fixed; }
+  .fnsheet col.rownum{ width:34px; } .fnsheet col.cA{ width:27%; } .fnsheet col.cB{ width:auto; } .fnsheet col.cC{ width:20%; }
+  th.colhead, td.rowhead{ background:var(--gray1); color:var(--gray3); font-family:var(--sans); font-weight:700;
+    font-size:11px; text-align:center; border:1px solid var(--grid); height:24px; }
+  td.cell{ border:1px solid var(--grid); height:28px; padding:0 10px;
+    font-family:var(--sans); font-size:13px; color:var(--navy); background:#fff;
+    vertical-align:middle; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+  td.num{ text-align:right; font-variant-numeric:tabular-nums; }
+  td.lbl{ font-weight:600; }
+  td.hdr{ background:#fff; font-weight:800; color:var(--navy); }
+  td.empty{ background:#fff; }
+  td.formulacell{ font-family:var(--mono); font-size:11.5px; color:var(--blue); font-weight:500; }
+  td.fn{ font-weight:800; color:var(--navy); background:rgba(181,226,250,.30); }
+  td.permark{ color:var(--gold); font-weight:800; }
+  td.click{ cursor:cell; }
+  td.click:hover{ background:rgba(13,101,199,.10); }
+  td.selected{ background:rgba(255,230,0,.22) !important; box-shadow:inset 0 0 0 2px var(--navy); font-weight:800; }
+
+  /* schedule sheet */
+  .schedsheet .scaption{ font-size:11.5px; color:var(--gray3); padding:10px 14px 8px; font-weight:600; }
+  .schedsheet .scaption b{ color:var(--navy); font-family:var(--mono); }
+  .scrollwrap{ max-height:360px; overflow:auto; border-top:1px solid var(--grid); }
+  .schedsheet col.rownum{ width:34px; } .schedsheet col.m{ width:13%; }
+  .schedsheet col.q{ width:auto; }
+  .schedsheet thead th{ position:sticky; top:0; z-index:2; }
+  tr.yearline td{ border-top:2px solid var(--navy); }
+
+  /* sheet tabs */
+  .tabs{ display:flex; gap:4px; padding:8px 14px 0; background:var(--gray1); border-top:1px solid var(--grid); }
+  .tab{ font-family:var(--sans); font-size:12px; font-weight:700; color:var(--gray3);
+    background:#dfe0e8; border:1px solid var(--grid); border-bottom:none;
+    border-radius:8px 8px 0 0; padding:7px 16px; cursor:pointer; transition:.12s; }
+  .tab:hover{ color:var(--navy); }
+  .tab.active{ color:var(--navy); background:#fff; border-bottom:2px solid var(--yellow); position:relative; top:1px; }
+
+  .tip{ display:flex; gap:12px; align-items:flex-start; background:#fff;
+    border-top:1px solid var(--grid); padding:14px 22px; }
+  .tip .mark{ flex:none; width:26px; height:26px; border-radius:6px; background:var(--yellow);
+    color:var(--navy); font-weight:800; font-size:15px; display:flex; align-items:center; justify-content:center; margin-top:1px; }
+  .tip p{ font-size:13px; line-height:1.5; color:var(--navy); }
+  .tip p b{ font-weight:700; }
+  .tip code{ font-family:var(--mono); font-size:11.5px; background:var(--gray1); color:var(--navy); padding:1px 5px; border-radius:4px; }
+</style>
+
+<div class="wrap">
+  <div class="frame">
+    <div class="bar">
+      <h1>Amortization in Excel &mdash; PMT, IPMT, PPMT</h1>
+      <div class="badge" id="badge">C4 selected</div>
+    </div>
+
+    <div class="fbar">
+      <div class="namebox" id="namebox">C4</div>
+      <div class="fx"><i>fx</i></div>
+      <div class="formula" id="formula">=PPMT(0.055/12, 1, 360, 400000)</div>
+      <button class="copy" id="copyBtn" onclick="copyFormula()">Copy</button>
+    </div>
+
+    <!-- SHEET 1: Functions -->
+    <div class="sheet fnsheet active" id="sheet-fn">
+      <table>
+        <colgroup><col class="rownum"><col class="cA"><col class="cB"><col class="cC"></colgroup>
+        <thead>
+          <tr><th class="colhead"></th><th class="colhead">A</th><th class="colhead">B</th><th class="colhead">C</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="rowhead">1</td><td class="cell hdr">What</td><td class="cell hdr">Formula</td><td class="cell hdr num">Result</td></tr>
+          <tr><td class="rowhead">2</td><td class="cell fn">Payment</td>
+            <td class="cell formulacell">=PMT(0.055/12, 360, 400000)</td>
+            <td class="cell num click" data-cell="C2" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td></tr>
+          <tr><td class="rowhead">3</td><td class="cell fn">Interest &middot; mo 1</td>
+            <td class="cell formulacell">=IPMT(0.055/12, 1, 360, 400000)</td>
+            <td class="cell num click" data-cell="C3" data-formula="=IPMT(0.055/12, 1, 360, 400000)">&minus;1,833.33</td></tr>
+          <tr><td class="rowhead">4</td><td class="cell fn">Principal &middot; mo 1</td>
+            <td class="cell formulacell">=PPMT(0.055/12, 1, 360, 400000)</td>
+            <td class="cell num click" data-cell="C4" data-formula="=PPMT(0.055/12, 1, 360, 400000)">&minus;437.83</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SHEET 2: Full schedule, first 5 years -->
+    <div class="sheet schedsheet" id="sheet-sched">
+      <div class="scaption">Loan <b>$400,000</b> &middot; 5.5% &middot; 30 yr &middot; payment <b>&minus;$2,271.16</b> &mdash; months 1&ndash;60 (first 5 years). Click any number to see its formula.</div>
+      <div class="scrollwrap">
+        <table>
+          <colgroup><col class="rownum"><col class="m"><col class="q"><col class="q"><col class="q"><col class="q"></colgroup>
+          <thead>
+            <tr>
+              <th class="colhead"></th>
+              <th class="colhead">A &middot; Month</th>
+              <th class="colhead">B &middot; Payment</th>
+              <th class="colhead">C &middot; Interest</th>
+              <th class="colhead">D &middot; Principal</th>
+              <th class="colhead">E &middot; Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+<tr class="srow"><td class="rowhead">2</td><td class="cell num permark">1</td><td class="cell num click" data-cell="B2" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C2" data-formula="=IPMT(0.055/12, A2, 360, 400000)">&minus;1,833.33</td><td class="cell num click hot-d" data-cell="D2" data-formula="=PPMT(0.055/12, A2, 360, 400000)">&minus;437.82</td><td class="cell num click" data-cell="E2" data-formula="=400000+D2">399,562.18</td></tr>
+<tr class="srow"><td class="rowhead">3</td><td class="cell num permark">2</td><td class="cell num click" data-cell="B3" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C3" data-formula="=IPMT(0.055/12, A3, 360, 400000)">&minus;1,831.33</td><td class="cell num click hot-d" data-cell="D3" data-formula="=PPMT(0.055/12, A3, 360, 400000)">&minus;439.83</td><td class="cell num click" data-cell="E3" data-formula="=E2+D3">399,122.35</td></tr>
+<tr class="srow"><td class="rowhead">4</td><td class="cell num permark">3</td><td class="cell num click" data-cell="B4" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C4" data-formula="=IPMT(0.055/12, A4, 360, 400000)">&minus;1,829.31</td><td class="cell num click hot-d" data-cell="D4" data-formula="=PPMT(0.055/12, A4, 360, 400000)">&minus;441.85</td><td class="cell num click" data-cell="E4" data-formula="=E3+D4">398,680.50</td></tr>
+<tr class="srow"><td class="rowhead">5</td><td class="cell num permark">4</td><td class="cell num click" data-cell="B5" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C5" data-formula="=IPMT(0.055/12, A5, 360, 400000)">&minus;1,827.29</td><td class="cell num click hot-d" data-cell="D5" data-formula="=PPMT(0.055/12, A5, 360, 400000)">&minus;443.87</td><td class="cell num click" data-cell="E5" data-formula="=E4+D5">398,236.63</td></tr>
+<tr class="srow"><td class="rowhead">6</td><td class="cell num permark">5</td><td class="cell num click" data-cell="B6" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C6" data-formula="=IPMT(0.055/12, A6, 360, 400000)">&minus;1,825.25</td><td class="cell num click hot-d" data-cell="D6" data-formula="=PPMT(0.055/12, A6, 360, 400000)">&minus;445.90</td><td class="cell num click" data-cell="E6" data-formula="=E5+D6">397,790.73</td></tr>
+<tr class="srow"><td class="rowhead">7</td><td class="cell num permark">6</td><td class="cell num click" data-cell="B7" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C7" data-formula="=IPMT(0.055/12, A7, 360, 400000)">&minus;1,823.21</td><td class="cell num click hot-d" data-cell="D7" data-formula="=PPMT(0.055/12, A7, 360, 400000)">&minus;447.95</td><td class="cell num click" data-cell="E7" data-formula="=E6+D7">397,342.78</td></tr>
+<tr class="srow"><td class="rowhead">8</td><td class="cell num permark">7</td><td class="cell num click" data-cell="B8" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C8" data-formula="=IPMT(0.055/12, A8, 360, 400000)">&minus;1,821.15</td><td class="cell num click hot-d" data-cell="D8" data-formula="=PPMT(0.055/12, A8, 360, 400000)">&minus;450.00</td><td class="cell num click" data-cell="E8" data-formula="=E7+D8">396,892.78</td></tr>
+<tr class="srow"><td class="rowhead">9</td><td class="cell num permark">8</td><td class="cell num click" data-cell="B9" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C9" data-formula="=IPMT(0.055/12, A9, 360, 400000)">&minus;1,819.09</td><td class="cell num click hot-d" data-cell="D9" data-formula="=PPMT(0.055/12, A9, 360, 400000)">&minus;452.06</td><td class="cell num click" data-cell="E9" data-formula="=E8+D9">396,440.71</td></tr>
+<tr class="srow"><td class="rowhead">10</td><td class="cell num permark">9</td><td class="cell num click" data-cell="B10" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C10" data-formula="=IPMT(0.055/12, A10, 360, 400000)">&minus;1,817.02</td><td class="cell num click hot-d" data-cell="D10" data-formula="=PPMT(0.055/12, A10, 360, 400000)">&minus;454.14</td><td class="cell num click" data-cell="E10" data-formula="=E9+D10">395,986.58</td></tr>
+<tr class="srow"><td class="rowhead">11</td><td class="cell num permark">10</td><td class="cell num click" data-cell="B11" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C11" data-formula="=IPMT(0.055/12, A11, 360, 400000)">&minus;1,814.94</td><td class="cell num click hot-d" data-cell="D11" data-formula="=PPMT(0.055/12, A11, 360, 400000)">&minus;456.22</td><td class="cell num click" data-cell="E11" data-formula="=E10+D11">395,530.36</td></tr>
+<tr class="srow"><td class="rowhead">12</td><td class="cell num permark">11</td><td class="cell num click" data-cell="B12" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C12" data-formula="=IPMT(0.055/12, A12, 360, 400000)">&minus;1,812.85</td><td class="cell num click hot-d" data-cell="D12" data-formula="=PPMT(0.055/12, A12, 360, 400000)">&minus;458.31</td><td class="cell num click" data-cell="E12" data-formula="=E11+D12">395,072.05</td></tr>
+<tr class="srow"><td class="rowhead">13</td><td class="cell num permark">12</td><td class="cell num click" data-cell="B13" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C13" data-formula="=IPMT(0.055/12, A13, 360, 400000)">&minus;1,810.75</td><td class="cell num click hot-d" data-cell="D13" data-formula="=PPMT(0.055/12, A13, 360, 400000)">&minus;460.41</td><td class="cell num click" data-cell="E13" data-formula="=E12+D13">394,611.64</td></tr>
+<tr class="srow yearline"><td class="rowhead">14</td><td class="cell num permark">13</td><td class="cell num click" data-cell="B14" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C14" data-formula="=IPMT(0.055/12, A14, 360, 400000)">&minus;1,808.64</td><td class="cell num click hot-d" data-cell="D14" data-formula="=PPMT(0.055/12, A14, 360, 400000)">&minus;462.52</td><td class="cell num click" data-cell="E14" data-formula="=E13+D14">394,149.12</td></tr>
+<tr class="srow"><td class="rowhead">15</td><td class="cell num permark">14</td><td class="cell num click" data-cell="B15" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C15" data-formula="=IPMT(0.055/12, A15, 360, 400000)">&minus;1,806.52</td><td class="cell num click hot-d" data-cell="D15" data-formula="=PPMT(0.055/12, A15, 360, 400000)">&minus;464.64</td><td class="cell num click" data-cell="E15" data-formula="=E14+D15">393,684.48</td></tr>
+<tr class="srow"><td class="rowhead">16</td><td class="cell num permark">15</td><td class="cell num click" data-cell="B16" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C16" data-formula="=IPMT(0.055/12, A16, 360, 400000)">&minus;1,804.39</td><td class="cell num click hot-d" data-cell="D16" data-formula="=PPMT(0.055/12, A16, 360, 400000)">&minus;466.77</td><td class="cell num click" data-cell="E16" data-formula="=E15+D16">393,217.71</td></tr>
+<tr class="srow"><td class="rowhead">17</td><td class="cell num permark">16</td><td class="cell num click" data-cell="B17" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C17" data-formula="=IPMT(0.055/12, A17, 360, 400000)">&minus;1,802.25</td><td class="cell num click hot-d" data-cell="D17" data-formula="=PPMT(0.055/12, A17, 360, 400000)">&minus;468.91</td><td class="cell num click" data-cell="E17" data-formula="=E16+D17">392,748.81</td></tr>
+<tr class="srow"><td class="rowhead">18</td><td class="cell num permark">17</td><td class="cell num click" data-cell="B18" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C18" data-formula="=IPMT(0.055/12, A18, 360, 400000)">&minus;1,800.10</td><td class="cell num click hot-d" data-cell="D18" data-formula="=PPMT(0.055/12, A18, 360, 400000)">&minus;471.06</td><td class="cell num click" data-cell="E18" data-formula="=E17+D18">392,277.75</td></tr>
+<tr class="srow"><td class="rowhead">19</td><td class="cell num permark">18</td><td class="cell num click" data-cell="B19" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C19" data-formula="=IPMT(0.055/12, A19, 360, 400000)">&minus;1,797.94</td><td class="cell num click hot-d" data-cell="D19" data-formula="=PPMT(0.055/12, A19, 360, 400000)">&minus;473.22</td><td class="cell num click" data-cell="E19" data-formula="=E18+D19">391,804.53</td></tr>
+<tr class="srow"><td class="rowhead">20</td><td class="cell num permark">19</td><td class="cell num click" data-cell="B20" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C20" data-formula="=IPMT(0.055/12, A20, 360, 400000)">&minus;1,795.77</td><td class="cell num click hot-d" data-cell="D20" data-formula="=PPMT(0.055/12, A20, 360, 400000)">&minus;475.39</td><td class="cell num click" data-cell="E20" data-formula="=E19+D20">391,329.15</td></tr>
+<tr class="srow"><td class="rowhead">21</td><td class="cell num permark">20</td><td class="cell num click" data-cell="B21" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C21" data-formula="=IPMT(0.055/12, A21, 360, 400000)">&minus;1,793.59</td><td class="cell num click hot-d" data-cell="D21" data-formula="=PPMT(0.055/12, A21, 360, 400000)">&minus;477.56</td><td class="cell num click" data-cell="E21" data-formula="=E20+D21">390,851.58</td></tr>
+<tr class="srow"><td class="rowhead">22</td><td class="cell num permark">21</td><td class="cell num click" data-cell="B22" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C22" data-formula="=IPMT(0.055/12, A22, 360, 400000)">&minus;1,791.40</td><td class="cell num click hot-d" data-cell="D22" data-formula="=PPMT(0.055/12, A22, 360, 400000)">&minus;479.75</td><td class="cell num click" data-cell="E22" data-formula="=E21+D22">390,371.83</td></tr>
+<tr class="srow"><td class="rowhead">23</td><td class="cell num permark">22</td><td class="cell num click" data-cell="B23" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C23" data-formula="=IPMT(0.055/12, A23, 360, 400000)">&minus;1,789.20</td><td class="cell num click hot-d" data-cell="D23" data-formula="=PPMT(0.055/12, A23, 360, 400000)">&minus;481.95</td><td class="cell num click" data-cell="E23" data-formula="=E22+D23">389,889.88</td></tr>
+<tr class="srow"><td class="rowhead">24</td><td class="cell num permark">23</td><td class="cell num click" data-cell="B24" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C24" data-formula="=IPMT(0.055/12, A24, 360, 400000)">&minus;1,787.00</td><td class="cell num click hot-d" data-cell="D24" data-formula="=PPMT(0.055/12, A24, 360, 400000)">&minus;484.16</td><td class="cell num click" data-cell="E24" data-formula="=E23+D24">389,405.72</td></tr>
+<tr class="srow"><td class="rowhead">25</td><td class="cell num permark">24</td><td class="cell num click" data-cell="B25" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C25" data-formula="=IPMT(0.055/12, A25, 360, 400000)">&minus;1,784.78</td><td class="cell num click hot-d" data-cell="D25" data-formula="=PPMT(0.055/12, A25, 360, 400000)">&minus;486.38</td><td class="cell num click" data-cell="E25" data-formula="=E24+D25">388,919.34</td></tr>
+<tr class="srow yearline"><td class="rowhead">26</td><td class="cell num permark">25</td><td class="cell num click" data-cell="B26" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C26" data-formula="=IPMT(0.055/12, A26, 360, 400000)">&minus;1,782.55</td><td class="cell num click hot-d" data-cell="D26" data-formula="=PPMT(0.055/12, A26, 360, 400000)">&minus;488.61</td><td class="cell num click" data-cell="E26" data-formula="=E25+D26">388,430.73</td></tr>
+<tr class="srow"><td class="rowhead">27</td><td class="cell num permark">26</td><td class="cell num click" data-cell="B27" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C27" data-formula="=IPMT(0.055/12, A27, 360, 400000)">&minus;1,780.31</td><td class="cell num click hot-d" data-cell="D27" data-formula="=PPMT(0.055/12, A27, 360, 400000)">&minus;490.85</td><td class="cell num click" data-cell="E27" data-formula="=E26+D27">387,939.88</td></tr>
+<tr class="srow"><td class="rowhead">28</td><td class="cell num permark">27</td><td class="cell num click" data-cell="B28" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C28" data-formula="=IPMT(0.055/12, A28, 360, 400000)">&minus;1,778.06</td><td class="cell num click hot-d" data-cell="D28" data-formula="=PPMT(0.055/12, A28, 360, 400000)">&minus;493.10</td><td class="cell num click" data-cell="E28" data-formula="=E27+D28">387,446.78</td></tr>
+<tr class="srow"><td class="rowhead">29</td><td class="cell num permark">28</td><td class="cell num click" data-cell="B29" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C29" data-formula="=IPMT(0.055/12, A29, 360, 400000)">&minus;1,775.80</td><td class="cell num click hot-d" data-cell="D29" data-formula="=PPMT(0.055/12, A29, 360, 400000)">&minus;495.36</td><td class="cell num click" data-cell="E29" data-formula="=E28+D29">386,951.42</td></tr>
+<tr class="srow"><td class="rowhead">30</td><td class="cell num permark">29</td><td class="cell num click" data-cell="B30" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C30" data-formula="=IPMT(0.055/12, A30, 360, 400000)">&minus;1,773.53</td><td class="cell num click hot-d" data-cell="D30" data-formula="=PPMT(0.055/12, A30, 360, 400000)">&minus;497.63</td><td class="cell num click" data-cell="E30" data-formula="=E29+D30">386,453.80</td></tr>
+<tr class="srow"><td class="rowhead">31</td><td class="cell num permark">30</td><td class="cell num click" data-cell="B31" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C31" data-formula="=IPMT(0.055/12, A31, 360, 400000)">&minus;1,771.25</td><td class="cell num click hot-d" data-cell="D31" data-formula="=PPMT(0.055/12, A31, 360, 400000)">&minus;499.91</td><td class="cell num click" data-cell="E31" data-formula="=E30+D31">385,953.89</td></tr>
+<tr class="srow"><td class="rowhead">32</td><td class="cell num permark">31</td><td class="cell num click" data-cell="B32" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C32" data-formula="=IPMT(0.055/12, A32, 360, 400000)">&minus;1,768.96</td><td class="cell num click hot-d" data-cell="D32" data-formula="=PPMT(0.055/12, A32, 360, 400000)">&minus;502.20</td><td class="cell num click" data-cell="E32" data-formula="=E31+D32">385,451.69</td></tr>
+<tr class="srow"><td class="rowhead">33</td><td class="cell num permark">32</td><td class="cell num click" data-cell="B33" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C33" data-formula="=IPMT(0.055/12, A33, 360, 400000)">&minus;1,766.65</td><td class="cell num click hot-d" data-cell="D33" data-formula="=PPMT(0.055/12, A33, 360, 400000)">&minus;504.50</td><td class="cell num click" data-cell="E33" data-formula="=E32+D33">384,947.18</td></tr>
+<tr class="srow"><td class="rowhead">34</td><td class="cell num permark">33</td><td class="cell num click" data-cell="B34" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C34" data-formula="=IPMT(0.055/12, A34, 360, 400000)">&minus;1,764.34</td><td class="cell num click hot-d" data-cell="D34" data-formula="=PPMT(0.055/12, A34, 360, 400000)">&minus;506.81</td><td class="cell num click" data-cell="E34" data-formula="=E33+D34">384,440.37</td></tr>
+<tr class="srow"><td class="rowhead">35</td><td class="cell num permark">34</td><td class="cell num click" data-cell="B35" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C35" data-formula="=IPMT(0.055/12, A35, 360, 400000)">&minus;1,762.02</td><td class="cell num click hot-d" data-cell="D35" data-formula="=PPMT(0.055/12, A35, 360, 400000)">&minus;509.14</td><td class="cell num click" data-cell="E35" data-formula="=E34+D35">383,931.23</td></tr>
+<tr class="srow"><td class="rowhead">36</td><td class="cell num permark">35</td><td class="cell num click" data-cell="B36" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C36" data-formula="=IPMT(0.055/12, A36, 360, 400000)">&minus;1,759.68</td><td class="cell num click hot-d" data-cell="D36" data-formula="=PPMT(0.055/12, A36, 360, 400000)">&minus;511.47</td><td class="cell num click" data-cell="E36" data-formula="=E35+D36">383,419.76</td></tr>
+<tr class="srow"><td class="rowhead">37</td><td class="cell num permark">36</td><td class="cell num click" data-cell="B37" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C37" data-formula="=IPMT(0.055/12, A37, 360, 400000)">&minus;1,757.34</td><td class="cell num click hot-d" data-cell="D37" data-formula="=PPMT(0.055/12, A37, 360, 400000)">&minus;513.82</td><td class="cell num click" data-cell="E37" data-formula="=E36+D37">382,905.94</td></tr>
+<tr class="srow yearline"><td class="rowhead">38</td><td class="cell num permark">37</td><td class="cell num click" data-cell="B38" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C38" data-formula="=IPMT(0.055/12, A38, 360, 400000)">&minus;1,754.99</td><td class="cell num click hot-d" data-cell="D38" data-formula="=PPMT(0.055/12, A38, 360, 400000)">&minus;516.17</td><td class="cell num click" data-cell="E38" data-formula="=E37+D38">382,389.77</td></tr>
+<tr class="srow"><td class="rowhead">39</td><td class="cell num permark">38</td><td class="cell num click" data-cell="B39" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C39" data-formula="=IPMT(0.055/12, A39, 360, 400000)">&minus;1,752.62</td><td class="cell num click hot-d" data-cell="D39" data-formula="=PPMT(0.055/12, A39, 360, 400000)">&minus;518.54</td><td class="cell num click" data-cell="E39" data-formula="=E38+D39">381,871.24</td></tr>
+<tr class="srow"><td class="rowhead">40</td><td class="cell num permark">39</td><td class="cell num click" data-cell="B40" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C40" data-formula="=IPMT(0.055/12, A40, 360, 400000)">&minus;1,750.24</td><td class="cell num click hot-d" data-cell="D40" data-formula="=PPMT(0.055/12, A40, 360, 400000)">&minus;520.91</td><td class="cell num click" data-cell="E40" data-formula="=E39+D40">381,350.32</td></tr>
+<tr class="srow"><td class="rowhead">41</td><td class="cell num permark">40</td><td class="cell num click" data-cell="B41" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C41" data-formula="=IPMT(0.055/12, A41, 360, 400000)">&minus;1,747.86</td><td class="cell num click hot-d" data-cell="D41" data-formula="=PPMT(0.055/12, A41, 360, 400000)">&minus;523.30</td><td class="cell num click" data-cell="E41" data-formula="=E40+D41">380,827.02</td></tr>
+<tr class="srow"><td class="rowhead">42</td><td class="cell num permark">41</td><td class="cell num click" data-cell="B42" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C42" data-formula="=IPMT(0.055/12, A42, 360, 400000)">&minus;1,745.46</td><td class="cell num click hot-d" data-cell="D42" data-formula="=PPMT(0.055/12, A42, 360, 400000)">&minus;525.70</td><td class="cell num click" data-cell="E42" data-formula="=E41+D42">380,301.33</td></tr>
+<tr class="srow"><td class="rowhead">43</td><td class="cell num permark">42</td><td class="cell num click" data-cell="B43" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C43" data-formula="=IPMT(0.055/12, A43, 360, 400000)">&minus;1,743.05</td><td class="cell num click hot-d" data-cell="D43" data-formula="=PPMT(0.055/12, A43, 360, 400000)">&minus;528.11</td><td class="cell num click" data-cell="E43" data-formula="=E42+D43">379,773.22</td></tr>
+<tr class="srow"><td class="rowhead">44</td><td class="cell num permark">43</td><td class="cell num click" data-cell="B44" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C44" data-formula="=IPMT(0.055/12, A44, 360, 400000)">&minus;1,740.63</td><td class="cell num click hot-d" data-cell="D44" data-formula="=PPMT(0.055/12, A44, 360, 400000)">&minus;530.53</td><td class="cell num click" data-cell="E44" data-formula="=E43+D44">379,242.69</td></tr>
+<tr class="srow"><td class="rowhead">45</td><td class="cell num permark">44</td><td class="cell num click" data-cell="B45" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C45" data-formula="=IPMT(0.055/12, A45, 360, 400000)">&minus;1,738.20</td><td class="cell num click hot-d" data-cell="D45" data-formula="=PPMT(0.055/12, A45, 360, 400000)">&minus;532.96</td><td class="cell num click" data-cell="E45" data-formula="=E44+D45">378,709.73</td></tr>
+<tr class="srow"><td class="rowhead">46</td><td class="cell num permark">45</td><td class="cell num click" data-cell="B46" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C46" data-formula="=IPMT(0.055/12, A46, 360, 400000)">&minus;1,735.75</td><td class="cell num click hot-d" data-cell="D46" data-formula="=PPMT(0.055/12, A46, 360, 400000)">&minus;535.40</td><td class="cell num click" data-cell="E46" data-formula="=E45+D46">378,174.33</td></tr>
+<tr class="srow"><td class="rowhead">47</td><td class="cell num permark">46</td><td class="cell num click" data-cell="B47" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C47" data-formula="=IPMT(0.055/12, A47, 360, 400000)">&minus;1,733.30</td><td class="cell num click hot-d" data-cell="D47" data-formula="=PPMT(0.055/12, A47, 360, 400000)">&minus;537.86</td><td class="cell num click" data-cell="E47" data-formula="=E46+D47">377,636.47</td></tr>
+<tr class="srow"><td class="rowhead">48</td><td class="cell num permark">47</td><td class="cell num click" data-cell="B48" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C48" data-formula="=IPMT(0.055/12, A48, 360, 400000)">&minus;1,730.83</td><td class="cell num click hot-d" data-cell="D48" data-formula="=PPMT(0.055/12, A48, 360, 400000)">&minus;540.32</td><td class="cell num click" data-cell="E48" data-formula="=E47+D48">377,096.15</td></tr>
+<tr class="srow"><td class="rowhead">49</td><td class="cell num permark">48</td><td class="cell num click" data-cell="B49" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C49" data-formula="=IPMT(0.055/12, A49, 360, 400000)">&minus;1,728.36</td><td class="cell num click hot-d" data-cell="D49" data-formula="=PPMT(0.055/12, A49, 360, 400000)">&minus;542.80</td><td class="cell num click" data-cell="E49" data-formula="=E48+D49">376,553.35</td></tr>
+<tr class="srow yearline"><td class="rowhead">50</td><td class="cell num permark">49</td><td class="cell num click" data-cell="B50" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C50" data-formula="=IPMT(0.055/12, A50, 360, 400000)">&minus;1,725.87</td><td class="cell num click hot-d" data-cell="D50" data-formula="=PPMT(0.055/12, A50, 360, 400000)">&minus;545.29</td><td class="cell num click" data-cell="E50" data-formula="=E49+D50">376,008.06</td></tr>
+<tr class="srow"><td class="rowhead">51</td><td class="cell num permark">50</td><td class="cell num click" data-cell="B51" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C51" data-formula="=IPMT(0.055/12, A51, 360, 400000)">&minus;1,723.37</td><td class="cell num click hot-d" data-cell="D51" data-formula="=PPMT(0.055/12, A51, 360, 400000)">&minus;547.79</td><td class="cell num click" data-cell="E51" data-formula="=E50+D51">375,460.28</td></tr>
+<tr class="srow"><td class="rowhead">52</td><td class="cell num permark">51</td><td class="cell num click" data-cell="B52" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C52" data-formula="=IPMT(0.055/12, A52, 360, 400000)">&minus;1,720.86</td><td class="cell num click hot-d" data-cell="D52" data-formula="=PPMT(0.055/12, A52, 360, 400000)">&minus;550.30</td><td class="cell num click" data-cell="E52" data-formula="=E51+D52">374,909.98</td></tr>
+<tr class="srow"><td class="rowhead">53</td><td class="cell num permark">52</td><td class="cell num click" data-cell="B53" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C53" data-formula="=IPMT(0.055/12, A53, 360, 400000)">&minus;1,718.34</td><td class="cell num click hot-d" data-cell="D53" data-formula="=PPMT(0.055/12, A53, 360, 400000)">&minus;552.82</td><td class="cell num click" data-cell="E53" data-formula="=E52+D53">374,357.16</td></tr>
+<tr class="srow"><td class="rowhead">54</td><td class="cell num permark">53</td><td class="cell num click" data-cell="B54" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C54" data-formula="=IPMT(0.055/12, A54, 360, 400000)">&minus;1,715.80</td><td class="cell num click hot-d" data-cell="D54" data-formula="=PPMT(0.055/12, A54, 360, 400000)">&minus;555.35</td><td class="cell num click" data-cell="E54" data-formula="=E53+D54">373,801.81</td></tr>
+<tr class="srow"><td class="rowhead">55</td><td class="cell num permark">54</td><td class="cell num click" data-cell="B55" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C55" data-formula="=IPMT(0.055/12, A55, 360, 400000)">&minus;1,713.26</td><td class="cell num click hot-d" data-cell="D55" data-formula="=PPMT(0.055/12, A55, 360, 400000)">&minus;557.90</td><td class="cell num click" data-cell="E55" data-formula="=E54+D55">373,243.91</td></tr>
+<tr class="srow"><td class="rowhead">56</td><td class="cell num permark">55</td><td class="cell num click" data-cell="B56" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C56" data-formula="=IPMT(0.055/12, A56, 360, 400000)">&minus;1,710.70</td><td class="cell num click hot-d" data-cell="D56" data-formula="=PPMT(0.055/12, A56, 360, 400000)">&minus;560.45</td><td class="cell num click" data-cell="E56" data-formula="=E55+D56">372,683.46</td></tr>
+<tr class="srow"><td class="rowhead">57</td><td class="cell num permark">56</td><td class="cell num click" data-cell="B57" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C57" data-formula="=IPMT(0.055/12, A57, 360, 400000)">&minus;1,708.13</td><td class="cell num click hot-d" data-cell="D57" data-formula="=PPMT(0.055/12, A57, 360, 400000)">&minus;563.02</td><td class="cell num click" data-cell="E57" data-formula="=E56+D57">372,120.43</td></tr>
+<tr class="srow"><td class="rowhead">58</td><td class="cell num permark">57</td><td class="cell num click" data-cell="B58" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C58" data-formula="=IPMT(0.055/12, A58, 360, 400000)">&minus;1,705.55</td><td class="cell num click hot-d" data-cell="D58" data-formula="=PPMT(0.055/12, A58, 360, 400000)">&minus;565.60</td><td class="cell num click" data-cell="E58" data-formula="=E57+D58">371,554.83</td></tr>
+<tr class="srow"><td class="rowhead">59</td><td class="cell num permark">58</td><td class="cell num click" data-cell="B59" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C59" data-formula="=IPMT(0.055/12, A59, 360, 400000)">&minus;1,702.96</td><td class="cell num click hot-d" data-cell="D59" data-formula="=PPMT(0.055/12, A59, 360, 400000)">&minus;568.20</td><td class="cell num click" data-cell="E59" data-formula="=E58+D59">370,986.63</td></tr>
+<tr class="srow"><td class="rowhead">60</td><td class="cell num permark">59</td><td class="cell num click" data-cell="B60" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C60" data-formula="=IPMT(0.055/12, A60, 360, 400000)">&minus;1,700.36</td><td class="cell num click hot-d" data-cell="D60" data-formula="=PPMT(0.055/12, A60, 360, 400000)">&minus;570.80</td><td class="cell num click" data-cell="E60" data-formula="=E59+D60">370,415.83</td></tr>
+<tr class="srow"><td class="rowhead">61</td><td class="cell num permark">60</td><td class="cell num click" data-cell="B61" data-formula="=PMT(0.055/12, 360, 400000)">&minus;2,271.16</td><td class="cell num click" data-cell="C61" data-formula="=IPMT(0.055/12, A61, 360, 400000)">&minus;1,697.74</td><td class="cell num click hot-d" data-cell="D61" data-formula="=PPMT(0.055/12, A61, 360, 400000)">&minus;573.42</td><td class="cell num click" data-cell="E61" data-formula="=E60+D61">369,842.41</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- tabs -->
+    <div class="tabs">
+      <div class="tab active" id="tab-fn" onclick="switchSheet('fn')">Functions</div>
+      <div class="tab" id="tab-sched" onclick="switchSheet('sched')">Schedule &middot; Yrs 1&ndash;5</div>
+    </div>
+
+    <div class="tip">
+      <div class="mark">!</div>
+      <p><b>Click any number to see its formula</b> in the bar above &mdash; just like selecting a cell in Excel. These three functions do all four steps for you, and because <code>IPMT</code> and <code>PPMT</code> take a <b>period number</b> (the 2nd argument), you can read any month directly. Open the <b>Schedule</b> tab to see the months listed down column A with the functions filled across &mdash; the full first 5 years. Results are <b>negative</b> for the same sign reason as the calculator: the money is leaving David and Carmen&rsquo;s account.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  var selected=null;
+  function selectCell(td){
+    if(selected) selected.classList.remove('selected');
+    td.classList.add('selected'); selected=td;
+    var ref=td.getAttribute('data-cell'), f=td.getAttribute('data-formula');
+    document.getElementById('namebox').textContent=ref;
+    document.getElementById('formula').textContent=f;
+    document.getElementById('badge').textContent=ref+' selected';
+  }
+  document.addEventListener('click', function(e){
+    var td=e.target.closest('td.click');
+    if(td) selectCell(td);
+  });
+
+  function switchSheet(which){
+    document.getElementById('sheet-fn').classList.toggle('active', which==='fn');
+    document.getElementById('sheet-sched').classList.toggle('active', which==='sched');
+    document.getElementById('tab-fn').classList.toggle('active', which==='fn');
+    document.getElementById('tab-sched').classList.toggle('active', which==='sched');
+    // sensible default selection per sheet
+    var def = (which==='fn') ? document.querySelector('#sheet-fn [data-cell="C4"]')
+                             : document.querySelector('#sheet-sched [data-cell="D2"]');
+    if(def) selectCell(def);
+  }
+
+  function copyFormula(){
+    var text=document.getElementById('formula').textContent.trim();
+    var btn=document.getElementById('copyBtn');
+    var done=function(){ btn.textContent='Copied!'; btn.classList.add('done');
+      setTimeout(function(){ btn.textContent='Copy'; btn.classList.remove('done'); },1600); };
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(done).catch(fb); } else fb();
+    function fb(){ var ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta);
+      ta.select(); try{document.execCommand('copy'); done();}catch(e){} document.body.removeChild(ta); }
+  }
+
+  // initial selection
+  selectCell(document.querySelector('#sheet-fn [data-cell="C4"]'));
+</script>
