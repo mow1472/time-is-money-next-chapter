@@ -1,0 +1,227 @@
+<!-- EYARC-styled interactive practice — car loan, sequential parts -->
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;0,800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+  :root{
+    --navy:#002E5D; --blue:#0d65c7; --lightblue:#B5E2FA;
+    --yellow:#FFE600; --gold:#F2BA05; --green:#6E9600;
+    --gray1:#EAEAF1; --gray2:#C2C2CE; --gray3:#747480;
+    --mono:'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+    --sans:'Open Sans', Arial, sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:var(--sans); background:#F2F3F7; color:var(--navy);
+    display:flex; justify-content:center; padding:40px 24px; min-height:100vh; }
+  .wrap{ width:100%; max-width:780px; }
+  .frame{ border:1px solid #000; border-radius:14px; overflow:hidden; background:#fff;
+    box-shadow:0 18px 40px -18px rgba(0,46,93,.55); }
+
+  .bar{ padding:18px 24px; background:var(--navy); border-bottom:3px solid var(--yellow);
+    display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .bar h1{ font-weight:800; font-size:17px; color:#fff; letter-spacing:.3px; }
+  .meta{ display:flex; align-items:center; gap:14px; }
+  .counter{ font-family:var(--mono); font-size:12px; font-weight:700; color:var(--navy);
+    background:var(--yellow); padding:5px 12px; border-radius:20px; white-space:nowrap; }
+  .dots{ display:flex; gap:7px; }
+  .dot{ width:9px; height:9px; border-radius:50%; background:rgba(255,255,255,.30); transition:.2s; }
+  .dot.solved{ background:var(--green); }
+  .dot.current{ box-shadow:0 0 0 3px rgba(255,230,0,.40); background:var(--yellow); }
+  .dot.current.solved{ background:var(--green); }
+
+  /* scenario banner (persistent) */
+  .scenario{ display:flex; gap:12px; align-items:flex-start; margin:18px 24px 0;
+    padding:13px 16px; background:rgba(181,226,250,.30); border-radius:10px; }
+  .scenario .ic{ flex:none; width:26px; height:26px; border-radius:6px; background:var(--navy); color:#fff;
+    font-weight:800; font-size:13px; display:flex; align-items:center; justify-content:center; margin-top:1px; }
+  .scenario p{ font-size:13px; line-height:1.5; }
+  .scenario p b{ font-weight:800; }
+
+  .body{ padding:4px 24px 22px; }
+
+  .q{ display:none; }
+  .q.active{ display:block; animation:pop .32s ease; }
+  @keyframes pop{ from{opacity:0; transform:translateY(10px) scale(.99);} to{opacity:1; transform:translateY(0) scale(1);} }
+  .q .qhead{ display:flex; gap:12px; align-items:baseline; margin-top:18px; }
+  .q .num{ flex:none; padding:0 9px; height:28px; border-radius:8px; background:var(--navy); color:#fff;
+    font-weight:800; font-size:12px; display:flex; align-items:center; justify-content:center; transform:translateY(2px); white-space:nowrap; }
+  .q.solved .num{ background:var(--green); }
+  .q .prompt{ font-size:14.5px; line-height:1.55; font-weight:700; }
+
+  .answer{ display:flex; gap:10px; align-items:center; margin-top:16px; flex-wrap:wrap; }
+  .answer .pre{ font-weight:700; font-size:13px; color:var(--gray3); }
+  .answer input{ font-family:var(--mono); font-size:14px; font-weight:500; color:var(--navy);
+    padding:9px 12px; border:1.5px solid var(--gray2); border-radius:8px; width:160px; outline:none; transition:border-color .15s; }
+  .answer input:focus{ border-color:var(--blue); }
+  .answer input.ok{ border-color:var(--green); background:rgba(110,150,0,.06); }
+  .answer input.bad{ border-color:#F84725; background:rgba(248,71,37,.05); }
+  button.check{ font-family:var(--sans); font-weight:700; font-size:13px; color:#fff; background:var(--blue);
+    border:none; cursor:pointer; padding:9px 18px; border-radius:8px; transition:background .15s, transform .05s; }
+  button.check:hover{ background:#0a52a3; } button.check:active{ transform:translateY(1px); }
+  .feedback{ font-size:13px; font-weight:700; margin-left:2px; min-height:18px; }
+  .feedback.ok{ color:var(--green); } .feedback.bad{ color:#F84725; }
+
+  .panel{ display:none; margin-top:12px; padding:13px 15px; border-radius:10px; font-size:13px; line-height:1.55; }
+  .panel.show{ display:block; animation:slide .25s ease; }
+  @keyframes slide{ from{opacity:0; transform:translateY(-4px);} to{opacity:1; transform:translateY(0);} }
+  .panel.t1{ background:rgba(181,226,250,.35); border-left:4px solid var(--blue); }
+  .panel.t2{ background:rgba(255,230,0,.14); border-left:4px solid var(--gold); }
+  .panel.reveal{ background:var(--navy); border-left:4px solid var(--yellow); color:#fff; }
+  .panel .tag{ font-weight:800; font-size:11px; letter-spacing:.6px; text-transform:uppercase; display:block; margin-bottom:5px; }
+  .panel.t1 .tag{ color:var(--blue); } .panel.t2 .tag{ color:#9a7400; } .panel.reveal .tag{ color:var(--yellow); }
+  .panel code{ font-family:var(--mono); font-size:12px; background:rgba(0,46,93,.06); padding:1px 5px; border-radius:4px; }
+  .panel.reveal code{ background:rgba(255,255,255,.12); color:#fff; }
+  .reveal .amt{ font-family:var(--mono); font-weight:700; font-size:22px; color:var(--yellow); }
+
+  .nextwrap{ display:none; margin-top:16px; }
+  .nextwrap.show{ display:block; animation:slide .25s ease; }
+  button.next{ font-family:var(--sans); font-weight:800; font-size:13px; color:var(--navy); background:var(--yellow);
+    border:none; cursor:pointer; padding:10px 20px; border-radius:8px; transition:background .15s, transform .05s; }
+  button.next:hover{ background:var(--gold); } button.next:active{ transform:translateY(1px); }
+
+  #finish{ display:none; text-align:center; padding:34px 20px 26px; }
+  #finish.show{ display:block; animation:pop .32s ease; }
+  #finish h2{ font-size:22px; font-weight:800; color:var(--navy); }
+  #finish .score{ font-family:var(--mono); font-size:40px; font-weight:700; color:var(--green); margin:10px 0 4px; }
+  #finish p{ font-size:13px; color:var(--gray3); margin-bottom:18px; }
+  button.restart{ font-family:var(--sans); font-weight:700; font-size:13px; color:#fff; background:var(--navy);
+    border:none; cursor:pointer; padding:10px 22px; border-radius:8px; }
+  button.restart:hover{ background:#013a76; }
+
+  .note{ display:flex; gap:12px; align-items:flex-start; margin-top:22px; padding:14px 16px;
+    background:rgba(181,226,250,.30); border-radius:10px; border-top:1px solid var(--gray1); }
+  .note .mark{ flex:none; width:26px; height:26px; border-radius:6px; background:var(--yellow); color:var(--navy);
+    font-weight:800; font-size:15px; display:flex; align-items:center; justify-content:center; margin-top:1px; }
+  .note p{ font-size:12.5px; line-height:1.5; }
+  .note code{ font-family:var(--mono); font-size:11.5px; background:#fff; border:1px solid var(--gray2); padding:1px 5px; border-radius:4px; }
+</style>
+
+<div class="wrap">
+  <div class="frame">
+    <div class="bar">
+      <h1>Car Loan &mdash; Step by Step</h1>
+      <div class="meta">
+        <div class="dots" id="dots"></div>
+        <div class="counter" id="counter">Part 1 of 5</div>
+      </div>
+    </div>
+
+    <div class="scenario" id="scenario">
+      <div class="ic">$</div>
+      <p>A car loan of <b>$28,000</b> is structured as a <b>48-month</b> loan at <b>6% annual interest</b>. Work through the first month one step at a time &mdash; each part unlocks once the one before it is correct.</p>
+    </div>
+
+    <div class="body">
+      <div id="quiz"></div>
+      <div id="finish">
+        <h2>Loan cracked!</h2>
+        <div class="score" id="score">0 / 5</div>
+        <button class="restart" onclick="restart()">Start over</button>
+      </div>
+      <div class="note" id="note">
+        <div class="mark">!</div>
+        <p>Answers accept <code>$34,257.82</code>, <code>34,257.82</code>, or <code>34257.82</code> &mdash; the dollar sign and commas are optional, and the payment is read as a positive amount even though the calculator shows it negative.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var QUESTIONS = [
+    {
+      part:"Part 1", prompt:"What is the monthly payment?",
+      h1:"Five-key solver: <code>N = 48</code>, <code>I/YR = 0.5</code> (6% &divide; 12), <code>PV = 28,000</code>, <code>FV = 0</code>, then press <code>PMT</code>.",
+      h2:"<code>PMT</code> comes out negative &mdash; that&rsquo;s just the payment leaving your pocket. Enter it as a positive amount.",
+      answer:657.58
+    },
+    {
+      part:"Part 2", prompt:"How much of payment 1 is interest?",
+      h1:"Interest = <b>beginning balance &times; monthly rate</b>.",
+      h2:"<code>$28,000 &times; 0.005 = ?</code>",
+      answer:140.00
+    },
+    {
+      part:"Part 3", prompt:"How much of payment 1 is principal?",
+      h1:"Principal = <b>payment &minus; interest</b>.",
+      h2:"<code>$657.58 &minus; $140.00 = ?</code>",
+      answer:517.58
+    },
+    {
+      part:"Part 4", prompt:"What is the balance after payment 1?",
+      h1:"Ending balance = <b>beginning balance &minus; principal</b>.",
+      h2:"<code>$28,000 &minus; $517.58 = ?</code>",
+      answer:27482.42
+    },
+    {
+      part:"Part 5", prompt:"What is the balance after the 36th payment?",
+      h1:"After 36 of 48 payments, only <b>12 remain</b>. The balance owed is the present value of those 12 remaining payments.",
+      h2:"<code>N = 12</code>, <code>I/YR = 0.5</code>, <code>PMT = 657.58</code>, <code>FV = 0</code>, then <code>CPT PV</code>.",
+      answer:7640.39
+    }
+  ];
+
+  var N=QUESTIONS.length, current=0;
+  var solved=new Array(N).fill(false), solvedClean=new Array(N).fill(false), attempts=new Array(N).fill(0);
+  function fmt(n){ return n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+  function buildDots(){ var d=document.getElementById('dots'); d.innerHTML='';
+    for(var k=0;k<N;k++){ var s=document.createElement('span'); s.className='dot'; s.id='dot'+k; d.appendChild(s); } }
+  function updateDots(){ for(var k=0;k<N;k++){ var el=document.getElementById('dot'+k); el.className='dot';
+      if(solved[k]) el.classList.add('solved'); if(k===current) el.classList.add('current'); }
+    document.getElementById('counter').textContent='Part '+(current+1)+' of '+N; }
+
+  function showPanel(i,t){ document.querySelector('#q'+i+' .panel.'+t).classList.add('show'); }
+  function showNext(i){ var w=document.querySelector('#q'+i+' .nextwrap'); w.classList.add('show');
+    w.querySelector('button.next').textContent=(i===N-1)?'See results':'Next part \u2192'; }
+
+  function check(i){
+    var card=document.getElementById('q'+i), input=card.querySelector('input'), fb=card.querySelector('.feedback');
+    var raw=input.value.replace(/[$,\s]/g,'');
+    if(raw===''){ fb.className='feedback bad'; fb.textContent='Enter an amount first.'; input.className=''; return; }
+    var val=Math.abs(parseFloat(raw));
+    if(isNaN(val)){ fb.className='feedback bad'; fb.textContent='That doesn\u2019t look like a number.'; input.className='bad'; return; }
+    if(Math.abs(val-QUESTIONS[i].answer)<=0.5){
+      fb.className='feedback ok'; fb.textContent='\u2713 Correct \u2014 $'+fmt(QUESTIONS[i].answer);
+      input.className='ok'; card.classList.add('solved');
+      if(!solved[i] && attempts[i]<3) solvedClean[i]=true;
+      solved[i]=true; updateDots(); showNext(i);
+    } else {
+      attempts[i]++; input.className='bad';
+      if(attempts[i]===1){ showPanel(i,'t1'); fb.className='feedback bad'; fb.textContent='Not quite \u2014 here\u2019s a hint.'; }
+      else if(attempts[i]===2){ showPanel(i,'t2'); fb.className='feedback bad'; fb.textContent='Still off \u2014 try this.'; }
+      else { showPanel(i,'reveal'); fb.className='feedback bad'; fb.textContent='Here\u2019s the answer \u2014 enter it to continue.'; }
+    }
+  }
+  function next(i){ document.getElementById('q'+i).classList.remove('active');
+    if(i===N-1){ finish(); return; }
+    current=i+1; var card=document.getElementById('q'+current); card.classList.add('active'); updateDots();
+    var inp=card.querySelector('input'); if(inp) setTimeout(function(){ inp.focus(); },50); }
+  function finish(){ var clean=solvedClean.filter(Boolean).length;
+    document.getElementById('score').textContent=clean+' / '+N;
+    document.getElementById('scenario').style.display='none';
+    document.getElementById('note').style.display='none';
+    document.getElementById('finish').classList.add('show'); }
+  function restart(){ current=0; solved.fill(false); solvedClean.fill(false); attempts.fill(0);
+    document.getElementById('finish').classList.remove('show');
+    document.getElementById('scenario').style.display='';
+    document.getElementById('note').style.display='';
+    render(); updateDots();
+    document.getElementById('q0').classList.add('active'); }
+
+  function render(){
+    var host=document.getElementById('quiz'); host.innerHTML='';
+    QUESTIONS.forEach(function(q,i){
+      var card=document.createElement('div'); card.className='q'; card.id='q'+i;
+      card.innerHTML=
+        '<div class="qhead"><div class="num">'+q.part+'</div><div class="prompt">'+q.prompt+'</div></div>'+
+        '<div class="answer"><span class="pre">Your answer:</span>'+
+          '<input type="text" inputmode="decimal" placeholder="$0.00" onkeydown="if(event.key===\'Enter\')check('+i+')">'+
+          '<button class="check" onclick="check('+i+')">Check</button><span class="feedback"></span></div>'+
+        '<div class="panel t1"><span class="tag">Hint 1</span>'+q.h1+'</div>'+
+        '<div class="panel t2"><span class="tag">Hint 2</span>'+q.h2+'</div>'+
+        '<div class="panel reveal"><span class="tag">Answer</span><span class="amt">$'+fmt(q.answer)+'</span></div>'+
+        '<div class="nextwrap"><button class="next" onclick="next('+i+')">Next part \u2192</button></div>';
+      host.appendChild(card);
+    });
+  }
+  buildDots(); render(); document.getElementById('q0').classList.add('active'); updateDots();
+</script>
