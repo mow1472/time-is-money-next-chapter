@@ -1,0 +1,85 @@
+<!-- EYARC-styled graphic — bond price as PV of coupons + par (timeline) -->
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800&display=swap');
+  :root{
+    --navy:#002E5D; --blue:#0d65c7; --lightblue:#B5E2FA;
+    --yellow:#FFE600; --gold:#F2BA05;
+    --gray1:#EAEAF1; --gray2:#C2C2CE; --gray3:#747480;
+    --sans:'Open Sans', Arial, sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:var(--sans); background:#F2F3F7; color:var(--navy);
+    display:flex; justify-content:center; padding:40px 24px; min-height:100vh; }
+  .wrap{ width:100%; max-width:800px; }
+  .frame{ border:1px solid #000; border-radius:14px; overflow:hidden; background:#fff;
+    box-shadow:0 18px 40px -18px rgba(0,46,93,.55); }
+  .bar{ padding:16px 22px; background:var(--navy); border-bottom:3px solid var(--yellow);
+    display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+  .bar h1{ font-weight:800; font-size:16px; color:#fff; letter-spacing:.3px; }
+  .bar .sub{ font-size:12px; font-weight:600; color:var(--lightblue); }
+  .chartwrap{ padding:18px 16px 6px; }
+  svg{ width:100%; height:auto; display:block; }
+  .note{ padding:6px 26px 18px; }
+  .note p{ font-size:13px; line-height:1.5; color:var(--gray3); font-weight:300; text-align:center; }
+  .note p b{ font-weight:600; color:var(--gray3); }
+</style>
+
+<div class="wrap">
+  <div class="frame">
+    <div class="bar">
+      <h1>What a Bond Is Worth Today</h1>
+      <div class="sub">Coupons + par, valued now</div>
+    </div>
+
+    <div class="chartwrap">
+      <svg viewBox="0 0 760 410" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Timeline of bond cash flows and the pricing equation">
+
+        <!-- par value arrow at year 10 (above the line, larger, gold) -->
+        <line x1="700" y1="188" x2="700" y2="122" stroke="#F2BA05" stroke-width="4"/>
+        <polygon points="693,132 707,132 700,114" fill="#F2BA05"/>
+        <text x="700" y="104" text-anchor="middle" font-size="13" font-weight="800" fill="#9a7400">$1,000 par</text>
+
+        <!-- timeline -->
+        <line x1="44" y1="210" x2="716" y2="210" stroke="#002E5D" stroke-width="2"/>
+        <polygon points="716,205 716,215 728,210" fill="#002E5D"/>
+        <text x="60" y="184" text-anchor="middle" font-size="9.5" font-weight="700" fill="#747480" letter-spacing=".5">TODAY</text>
+        <text x="734" y="200" font-size="9.5" font-weight="700" fill="#747480">yr</text>
+
+        <!-- year ticks + numbers -->
+        <line x1="60" y1="205" x2="60" y2="215" stroke="#C2C2CE" stroke-width="1"/><text x="60" y="200" text-anchor="middle" font-size="10" font-weight="700" fill="#747480">0</text>
+        <line x1="124" y1="205" x2="124" y2="215" stroke="#C2C2CE" stroke-width="1"/><text x="124" y="200" text-anchor="middle" font-size="10" font-weight="700" fill="#747480">1</text>
+        <line x1="188" y1="205" x2="188" y2="215" stroke="#C2C2CE" stroke-width="1"/><text x="188" y="200" text-anchor="middle" font-size="10" font-weight="700" fill="#747480">2</text>
+        <line x1="252" y1="205" x2="252" y2="215" stroke="#C2C2CE" stroke-width="1"/><text x="252" y="200" text-anchor="middle" font-size="10" font-weight="700" fill="#747480">3</text>
+        <line x1="316" y1="205" x2="316" y2="215" stroke="#C2C2CE" stroke-width="1"/><text x="316" y="200" text-anchor="middle" font-size="10" font-weight="700" fill="#747480">4</text>
+        <line x1="380" y1="205" x2="380" y2="215" stroke="#C2C2CE" stroke-width="1"/><text x="380" y="200" text-anchor="middle" font-size="10" font-weight="700" fill="#747480">5</text>
+        <line x1="444" y1="205" x2="444" y2="215" stroke="#C2C2CE" stroke-width="1"/><text x="444" y="200" text-anchor="middle" font-size="10" font-weight="700" fill="#747480">6</text>
+        <line x1="508" y1="205" x2="508" y2="215" stroke="#C2C2CE" stroke-width="1"/><text x="508" y="200" text-anchor="middle" font-size="10" font-weight="700" fill="#747480">7</text>
+        <line x1="572" y1="205" x2="572" y2="215" stroke="#C2C2CE" stroke-width="1"/><text x="572" y="200" text-anchor="middle" font-size="10" font-weight="700" fill="#747480">8</text>
+        <line x1="636" y1="205" x2="636" y2="215" stroke="#C2C2CE" stroke-width="1"/><text x="636" y="200" text-anchor="middle" font-size="10" font-weight="700" fill="#747480">9</text>
+        <line x1="700" y1="205" x2="700" y2="215" stroke="#C2C2CE" stroke-width="1"/><text x="700" y="200" text-anchor="middle" font-size="10" font-weight="700" fill="#747480">10</text>
+
+        <!-- ten coupon arrows (below the line, blue) -->
+        <line x1="124" y1="300" x2="124" y2="226" stroke="#0d65c7" stroke-width="2.4"/><polygon points="119,230 129,230 124,218" fill="#0d65c7"/><text x="124" y="316" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0d65c7">$60</text>
+        <line x1="188" y1="300" x2="188" y2="226" stroke="#0d65c7" stroke-width="2.4"/><polygon points="183,230 193,230 188,218" fill="#0d65c7"/><text x="188" y="316" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0d65c7">$60</text>
+        <line x1="252" y1="300" x2="252" y2="226" stroke="#0d65c7" stroke-width="2.4"/><polygon points="247,230 257,230 252,218" fill="#0d65c7"/><text x="252" y="316" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0d65c7">$60</text>
+        <line x1="316" y1="300" x2="316" y2="226" stroke="#0d65c7" stroke-width="2.4"/><polygon points="311,230 321,230 316,218" fill="#0d65c7"/><text x="316" y="316" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0d65c7">$60</text>
+        <line x1="380" y1="300" x2="380" y2="226" stroke="#0d65c7" stroke-width="2.4"/><polygon points="375,230 385,230 380,218" fill="#0d65c7"/><text x="380" y="316" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0d65c7">$60</text>
+        <line x1="444" y1="300" x2="444" y2="226" stroke="#0d65c7" stroke-width="2.4"/><polygon points="439,230 449,230 444,218" fill="#0d65c7"/><text x="444" y="316" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0d65c7">$60</text>
+        <line x1="508" y1="300" x2="508" y2="226" stroke="#0d65c7" stroke-width="2.4"/><polygon points="503,230 513,230 508,218" fill="#0d65c7"/><text x="508" y="316" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0d65c7">$60</text>
+        <line x1="572" y1="300" x2="572" y2="226" stroke="#0d65c7" stroke-width="2.4"/><polygon points="567,230 577,230 572,218" fill="#0d65c7"/><text x="572" y="316" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0d65c7">$60</text>
+        <line x1="636" y1="300" x2="636" y2="226" stroke="#0d65c7" stroke-width="2.4"/><polygon points="631,230 641,230 636,218" fill="#0d65c7"/><text x="636" y="316" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0d65c7">$60</text>
+        <line x1="700" y1="300" x2="700" y2="226" stroke="#0d65c7" stroke-width="2.4"/><polygon points="695,230 705,230 700,218" fill="#0d65c7"/><text x="700" y="316" text-anchor="middle" font-size="10.5" font-weight="700" fill="#0d65c7">$60</text>
+
+        <!-- equation -->
+        <text x="380" y="368" text-anchor="middle" font-size="20" font-weight="800">
+          <tspan fill="#002E5D">Bond price = </tspan><tspan fill="#0d65c7">PV of coupons</tspan><tspan fill="#002E5D"> + </tspan><tspan fill="#9a7400">PV of par</tspan>
+        </text>
+      </svg>
+    </div>
+
+    <div class="note">
+      <p>A bond&rsquo;s price today is simply the <b>value of every future payment, brought back to now</b> &mdash; the ten $60 coupons plus the $1,000 returned at maturity.</p>
+    </div>
+  </div>
+</div>
