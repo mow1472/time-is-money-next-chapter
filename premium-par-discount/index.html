@@ -1,0 +1,94 @@
+<!-- EYARC-styled graphic — premium / par / discount comparison -->
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800&family=JetBrains+Mono:wght@400;700&display=swap');
+  :root{
+    --navy:#002E5D; --blue:#0d65c7; --lightblue:#B5E2FA;
+    --yellow:#FFE600; --gold:#F2BA05;
+    --prembg:#FCF1CE;            /* soft tint of gold */
+    --discbg:#E3F1FB;            /* soft tint of light blue */
+    --gray1:#EAEAF1; --gray2:#C2C2CE; --gray3:#747480; --neutral:#EDEEF3;
+    --mono:'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+    --sans:'Open Sans', Arial, sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:var(--sans); background:#F2F3F7; color:var(--navy);
+    display:flex; justify-content:center; padding:40px 24px; min-height:100vh; }
+  .wrap{ width:100%; max-width:800px; }
+  .frame{ border:1px solid #000; border-radius:14px; overflow:hidden; background:#fff;
+    box-shadow:0 18px 40px -18px rgba(0,46,93,.55); }
+  .bar{ padding:16px 22px; background:var(--navy); border-bottom:3px solid var(--yellow);
+    display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+  .bar h1{ font-weight:800; font-size:16px; color:#fff; letter-spacing:.3px; }
+  .bar .sub{ font-size:12px; font-weight:600; color:var(--lightblue); }
+
+  .tbl{ padding:18px 20px 8px; }
+  .colhead{ display:grid; grid-template-columns:1.5fr 1fr 0.5fr 1fr 1.3fr; gap:10px;
+    padding:0 16px 8px; font-size:10px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; color:var(--gray3); }
+  .colhead span:nth-child(2),.colhead span:nth-child(4){ text-align:center; }
+  .colhead span:nth-child(5){ text-align:right; }
+
+  .row{ display:grid; grid-template-columns:1.5fr 1fr 0.5fr 1fr 1.3fr; gap:10px; align-items:center;
+    border-radius:11px; padding:16px 16px; margin-bottom:11px; border-left:5px solid var(--gray2); }
+  .row.prem{ background:var(--prembg); border-left-color:var(--gold); }
+  .row.par{ background:var(--neutral); border-left-color:var(--gray2); }
+  .row.disc{ background:var(--discbg); border-left-color:var(--blue); }
+
+  .type .nm{ font-size:14.5px; font-weight:800; color:var(--navy); }
+
+  .cell{ text-align:center; }
+  .cell .big{ font-family:var(--mono); font-size:20px; font-weight:700; color:var(--navy); line-height:1; }
+  .cell .lab{ font-size:9.5px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; color:var(--gray3); margin-top:4px; }
+
+  .op{ font-family:var(--mono); font-size:26px; font-weight:700; text-align:center; line-height:1; color:var(--navy); }
+
+  .res{ text-align:right; font-size:14px; font-weight:800; color:var(--navy); }
+  .res .o{ color:var(--navy); }
+
+  .note{ padding:6px 24px 18px; }
+  .note p{ font-size:13px; line-height:1.5; color:var(--gray3); font-weight:300; text-align:center; }
+  .note p b{ font-weight:600; color:var(--gray3); }
+</style>
+
+<div class="wrap">
+  <div class="frame">
+    <div class="bar">
+      <h1>Premium, Par &amp; Discount Bonds</h1>
+      <div class="sub">Coupon vs. YTM sets the price</div>
+    </div>
+
+    <div class="tbl">
+      <div class="colhead">
+        <span>Bond type</span><span>Coupon</span><span></span><span>YTM</span><span>Price</span>
+      </div>
+
+      <div class="row prem">
+        <div class="type"><span class="nm">Premium bond</span></div>
+        <div class="cell"><div class="big">7%</div><div class="lab">coupon</div></div>
+        <div class="op">&gt;</div>
+        <div class="cell"><div class="big">5%</div><div class="lab">YTM</div></div>
+        <div class="res"><span>Price</span> <span class="o">&gt;</span> <span>$1,000</span></div>
+      </div>
+
+      <div class="row par">
+        <div class="type"><span class="nm">Par bond</span></div>
+        <div class="cell"><div class="big">6%</div><div class="lab">coupon</div></div>
+        <div class="op">=</div>
+        <div class="cell"><div class="big">6%</div><div class="lab">YTM</div></div>
+        <div class="res"><span>Price</span> <span class="o">=</span> <span>$1,000</span></div>
+      </div>
+
+      <div class="row disc">
+        <div class="type"><span class="nm">Discount bond</span></div>
+        <div class="cell"><div class="big">5%</div><div class="lab">coupon</div></div>
+        <div class="op">&lt;</div>
+        <div class="cell"><div class="big">7%</div><div class="lab">YTM</div></div>
+        <div class="res"><span>Price</span> <span class="o">&lt;</span> <span>$1,000</span></div>
+      </div>
+    </div>
+
+    <div class="note">
+      <p>The coupon and the YTM point the same way as the price: <b>coupon above yield &rarr; premium</b>, <b>equal &rarr; par</b>, <b>below &rarr; discount</b>.</p>
+    </div>
+  </div>
+</div>
