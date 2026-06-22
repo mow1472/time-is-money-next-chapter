@@ -1,0 +1,103 @@
+<!-- EYARC-styled graphic — HP 10bII+ amortization shortcut, keystroke table -->
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400;1,500&display=swap');
+  :root{
+    --navy:#002E5D; --navy2:#013A76;
+    --yellow:#FFE600; --gold:#F2BA05; --lightblue:#B5E2FA;
+    --muted:#7E93B0; --line:rgba(255,255,255,.10);
+    --mono:'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+    --sans:'Open Sans', Arial, sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:var(--sans); background:#F2F3F7;
+    display:flex; justify-content:center; align-items:flex-start; padding:40px 24px; min-height:100vh; }
+  .card{ width:100%; max-width:660px; background:var(--navy);
+    background-image:linear-gradient(160deg,#013A76 0%,#002E5D 55%,#00264D 100%);
+    border-radius:14px; padding:26px 30px 28px;
+    box-shadow:0 18px 44px -18px rgba(0,46,93,.6); }
+
+  .title{ color:#fff; font-weight:800; font-size:17px; letter-spacing:.2px; }
+  .rule{ height:3px; background:var(--yellow); border-radius:2px; margin:13px 0 16px; }
+
+  .setup{ font-family:var(--mono); font-size:12px; color:var(--lightblue);
+    background:rgba(181,226,250,.08); border:1px solid var(--line); border-radius:8px;
+    padding:9px 13px; margin-bottom:20px; }
+  .setup b{ color:#fff; font-weight:700; }
+  .setup .keys{ color:var(--yellow); font-weight:700; }
+
+  .grid{ display:grid; grid-template-columns:200px 1fr; column-gap:22px; }
+  .head{ font-size:10.5px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase;
+    color:var(--muted); padding-bottom:12px; }
+
+  .row{ display:contents; }
+  .ks, .why{ padding:9px 0; border-top:1px solid var(--line); display:flex; align-items:center; }
+  .ks{ font-family:var(--mono); font-size:13.5px; }
+  .v{ display:inline-block; width:48px; text-align:right; color:#fff; font-weight:500; padding-right:14px; }
+  .k{ color:var(--yellow); font-weight:700; letter-spacing:.3px; }
+  .sh{ color:var(--gold); font-weight:700; margin-right:5px; }
+  .why{ font-family:var(--mono); font-style:italic; font-size:12.5px; color:var(--lightblue); line-height:1.4; }
+  .why .out{ font-style:normal; color:var(--yellow); font-weight:700; }
+
+  /* the amort menu trigger */
+  .row.menu .ks, .row.menu .why{ background:rgba(255,230,0,.07); }
+
+  .foot{ margin-top:20px; border-top:1px solid var(--line); padding-top:16px; }
+  .foot .tag{ font-size:10.5px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+    color:var(--gold); display:block; margin-bottom:7px; }
+  .foot p{ font-family:var(--mono); font-size:11.5px; color:var(--lightblue); line-height:1.6; }
+  .foot p b{ color:#fff; font-weight:700; }
+
+  @media (max-width:540px){
+    .grid{ grid-template-columns:1fr; column-gap:0; }
+    .head.h2{ display:none; }
+    .why{ border-top:none; padding-top:0; padding-bottom:14px; padding-left:48px; }
+  }
+</style>
+
+<div class="card">
+  <div class="title">Amortization Shortcut &mdash; HP 10bII+</div>
+  <div class="rule"></div>
+
+  <div class="setup">First enter the loan, then read principal, interest, and balance straight off the calculator &mdash; no table by hand.&nbsp; <b>Already stored:</b> <span class="keys">N&nbsp;&middot;&nbsp;I/YR&nbsp;&middot;&nbsp;PV&nbsp;&middot;&nbsp;PMT</span></div>
+
+  <div class="grid">
+    <div class="head h1">Keystrokes</div>
+    <div class="head h2">What you see / why</div>
+
+    <div class="row">
+      <div class="ks"><span class="v">45</span><span class="k">INPUT</span></div>
+      <div class="why">sets the starting payment</div>
+    </div>
+
+    <div class="row">
+      <div class="ks"><span class="v">45</span><span class="k">INPUT</span></div>
+      <div class="why">display shows 45&ndash;45 (a single payment)</div>
+    </div>
+
+    <div class="row menu">
+      <div class="ks"><span class="v"></span><span class="k"><span class="sh">&#9670;</span>AMORT</span></div>
+      <div class="why">enters the amort menu (shift + FV)</div>
+    </div>
+
+    <div class="row">
+      <div class="ks"><span class="v"></span><span class="k">=</span></div>
+      <div class="why"><span class="out">PRIN</span> &mdash; principal paid in Payment 45</div>
+    </div>
+
+    <div class="row">
+      <div class="ks"><span class="v"></span><span class="k">=</span></div>
+      <div class="why"><span class="out">INT</span> &mdash; interest paid in Payment 45</div>
+    </div>
+
+    <div class="row">
+      <div class="ks"><span class="v"></span><span class="k">=</span></div>
+      <div class="why"><span class="out">BAL</span> &mdash; balance after Payment 45</div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span class="tag">Tip &middot; The range sets what you see</span>
+    <p><b>45&ndash;45</b> &rarr; principal and interest for Payment 45 alone. &nbsp;<b>1&ndash;45</b> &rarr; total principal and interest paid across Payments 1&ndash;45, plus the balance after Payment 45 &mdash; use this when you need cumulative amounts instead of a single payment.</p>
+  </div>
+</div>
