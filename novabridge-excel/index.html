@@ -1,0 +1,243 @@
+<!-- EYARC-styled graphic — NovaBridge two-stage DDM, interactive Excel walkthrough -->
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+  :root{
+    --navy:#002E5D; --blue:#0d65c7; --lightblue:#B5E2FA;
+    --yellow:#FFE600; --gold:#F2BA05; --green:#217346;
+    --answerfill:#FFF7BF; --gray1:#EAEAF1; --gray2:#C2C2CE; --gray3:#747480;
+    --gridline:#D4D7DC; --hdrfill:#EEF1F5; --bandfill:#DCEEFB;
+    --mono:'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+    --sans:'Open Sans', Arial, sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:var(--sans); background:#F2F3F7; color:var(--navy);
+    display:flex; justify-content:center; align-items:flex-start; padding:40px 24px; min-height:100vh; }
+  .wrap{ width:100%; max-width:720px; }
+  .frame{ border:1px solid #000; border-radius:14px; overflow:hidden; background:#fff;
+    box-shadow:0 18px 40px -18px rgba(0,46,93,.55); }
+
+  .bar{ padding:16px 22px; background:var(--navy); border-bottom:3px solid var(--yellow);
+    display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .bar h1{ font-weight:800; font-size:16px; color:#fff; letter-spacing:.3px; }
+  .bar .chip{ font-family:var(--mono); font-size:11px; font-weight:700; color:var(--navy);
+    background:var(--yellow); padding:5px 13px; border-radius:20px; white-space:nowrap; }
+
+  .body{ padding:18px 22px 20px; }
+
+  /* formula bar */
+  .fbar{ display:flex; align-items:stretch; border:1px solid var(--gray2); border-radius:6px;
+    overflow:hidden; margin-bottom:14px; height:34px; }
+  .fbar .name{ font-family:var(--mono); font-size:12px; font-weight:700; color:var(--navy);
+    background:#fff; border-right:1px solid var(--gray2); display:flex; align-items:center;
+    justify-content:center; width:58px; flex:none; }
+  .fbar .fx{ font-style:italic; color:var(--gray3); display:flex; align-items:center; padding:0 12px;
+    border-right:1px solid var(--gray2); font-size:13px; flex:none; }
+  .fbar .formula{ font-family:var(--mono); font-size:12.5px; color:#21252b; font-weight:500;
+    display:flex; align-items:center; padding:0 12px; flex:1; min-width:0; overflow:hidden; white-space:nowrap; }
+  .fbar .copy{ font-family:var(--sans); font-size:12px; font-weight:700; color:var(--navy);
+    background:var(--yellow); border:none; border-left:1px solid var(--gray2); cursor:pointer;
+    padding:0 16px; flex:none; transition:background .12s; }
+  .fbar .copy:hover{ background:var(--gold); }
+
+  /* sheet */
+  .sheet{ display:grid; grid-template-columns:30px 1fr 132px 132px; border:1px solid var(--gray2);
+    border-radius:4px; overflow:hidden; }
+  .colh, .gut, .cell{ border-right:1px solid var(--gridline); border-bottom:1px solid var(--gridline);
+    font-size:12.5px; padding:7px 10px; min-height:30px; display:flex; flex-direction:column; justify-content:center; }
+  .colh{ background:var(--hdrfill); color:var(--gray3); font-weight:700; font-size:11px;
+    align-items:center; padding:5px; }
+  .gut{ background:var(--hdrfill); color:var(--gray3); font-weight:700; font-size:11px; align-items:center;
+    justify-content:center; }
+  .cell{ background:#fff; position:relative; }
+  .cell.v{ align-items:flex-end; }
+  [data-ref]{ cursor:pointer; }
+  [data-ref]:hover:not(.selected){ box-shadow:inset 0 0 0 1px rgba(13,101,199,.45); }
+  .selected{ box-shadow:inset 0 0 0 2px var(--green) !important; z-index:2; }
+
+  .lab{ color:var(--navy); }
+  .lab.b{ font-weight:700; }
+  .val{ font-family:var(--mono); font-weight:600; color:var(--navy); font-size:13px; }
+  .val.rate{ color:var(--blue); }
+
+  .section{ grid-column:2 / 5; background:var(--bandfill); color:var(--navy); font-weight:800;
+    font-size:11.5px; letter-spacing:.4px; text-transform:uppercase; position:relative; }
+  .thead{ background:var(--hdrfill); font-weight:700; color:var(--navy); }
+  .answer{ background:var(--answerfill); }
+  .answer .val{ color:var(--navy); font-size:15px; font-weight:700; }
+
+  .note{ display:flex; gap:12px; align-items:flex-start; margin-top:16px; padding:13px 15px;
+    background:rgba(181,226,250,.32); border-radius:10px; }
+  .note .mk{ flex:none; width:24px; height:24px; border-radius:6px; background:var(--yellow); color:var(--navy);
+    font-weight:800; font-size:14px; display:flex; align-items:center; justify-content:center; margin-top:1px; }
+  .note p{ font-size:12.5px; line-height:1.6; }
+  .note p b{ color:var(--navy); }
+  .note code{ font-family:var(--mono); font-size:11.5px; background:rgba(181,226,250,.7); color:var(--navy);
+    padding:1px 5px; border-radius:4px; }
+</style>
+
+<div class="wrap">
+  <div class="frame">
+    <div class="bar">
+      <h1>NovaBridge Two-Stage DDM &mdash; in Excel</h1>
+      <span class="chip" id="selchip">B18 selected</span>
+    </div>
+
+    <div class="body">
+
+      <div class="fbar">
+        <span class="name" id="namebox">B18</span>
+        <span class="fx">f<i>x</i></span>
+        <span class="formula" id="formula">=B17+B15</span>
+        <button class="copy" id="copybtn">Copy</button>
+      </div>
+
+      <div class="sheet">
+        <div class="colh"></div>
+        <div class="colh">A</div>
+        <div class="colh">B</div>
+        <div class="colh">C</div>
+
+        <!-- 1 -->
+        <div class="gut">1</div>
+        <div class="section" data-ref="A1" data-fx="Inputs">Inputs</div>
+
+        <!-- 2 -->
+        <div class="gut">2</div>
+        <div class="cell" data-ref="A2" data-fx="Last dividend paid (D&#8320;)"><span class="lab">Last dividend paid (D&#8320;)</span></div>
+        <div class="cell v" data-ref="B2" data-fx="1.00"><span class="val">$1.00</span></div>
+        <div class="cell" data-ref="C2" data-fx=""></div>
+
+        <!-- 3 -->
+        <div class="gut">3</div>
+        <div class="cell" data-ref="A3" data-fx="High-growth rate (g&#8321;)"><span class="lab">High-growth rate (g&#8321;)</span></div>
+        <div class="cell v" data-ref="B3" data-fx="20%"><span class="val rate">20%</span></div>
+        <div class="cell" data-ref="C3" data-fx=""></div>
+
+        <!-- 4 -->
+        <div class="gut">4</div>
+        <div class="cell" data-ref="A4" data-fx="High-growth years (n)"><span class="lab">High-growth years (n)</span></div>
+        <div class="cell v" data-ref="B4" data-fx="3"><span class="val">3</span></div>
+        <div class="cell" data-ref="C4" data-fx=""></div>
+
+        <!-- 5 -->
+        <div class="gut">5</div>
+        <div class="cell" data-ref="A5" data-fx="Terminal growth (g&#8322;)"><span class="lab">Terminal growth (g&#8322;)</span></div>
+        <div class="cell v" data-ref="B5" data-fx="4%"><span class="val rate">4%</span></div>
+        <div class="cell" data-ref="C5" data-fx=""></div>
+
+        <!-- 6 -->
+        <div class="gut">6</div>
+        <div class="cell" data-ref="A6" data-fx="Required return (r)"><span class="lab">Required return (r)</span></div>
+        <div class="cell v" data-ref="B6" data-fx="12%"><span class="val rate">12%</span></div>
+        <div class="cell" data-ref="C6" data-fx=""></div>
+
+        <!-- 7 -->
+        <div class="gut">7</div>
+        <div class="section" data-ref="A7" data-fx="Stage 1 &mdash; discount each high-growth dividend">Stage 1 &mdash; discount each high-growth dividend</div>
+
+        <!-- 8 -->
+        <div class="gut">8</div>
+        <div class="cell thead" data-ref="A8" data-fx="Year"><span class="lab b">Year</span></div>
+        <div class="cell thead v" data-ref="B8" data-fx="Dividend"><span class="lab b">Dividend</span></div>
+        <div class="cell thead v" data-ref="C8" data-fx="PV @ 12%"><span class="lab b">PV @ 12%</span></div>
+
+        <!-- 9 -->
+        <div class="gut">9</div>
+        <div class="cell" data-ref="A9" data-fx="1"><span class="val">1</span></div>
+        <div class="cell v" data-ref="B9" data-fx="=B2*(1+$B$3)"><span class="val">$1.20</span></div>
+        <div class="cell v" data-ref="C9" data-fx="=-PV($B$6,A9,0,B9)"><span class="val">$1.07</span></div>
+
+        <!-- 10 -->
+        <div class="gut">10</div>
+        <div class="cell" data-ref="A10" data-fx="2"><span class="val">2</span></div>
+        <div class="cell v" data-ref="B10" data-fx="=B9*(1+$B$3)"><span class="val">$1.44</span></div>
+        <div class="cell v" data-ref="C10" data-fx="=-PV($B$6,A10,0,B10)"><span class="val">$1.15</span></div>
+
+        <!-- 11 -->
+        <div class="gut">11</div>
+        <div class="cell" data-ref="A11" data-fx="3"><span class="val">3</span></div>
+        <div class="cell v" data-ref="B11" data-fx="=B10*(1+$B$3)"><span class="val">$1.73</span></div>
+        <div class="cell v" data-ref="C11" data-fx="=-PV($B$6,A11,0,B11)"><span class="val">$1.23</span></div>
+
+        <!-- 12 -->
+        <div class="gut">12</div>
+        <div class="section" data-ref="A12" data-fx="Stage 2 &mdash; terminal value (Gordon growth)">Stage 2 &mdash; terminal value (Gordon growth)</div>
+
+        <!-- 13 -->
+        <div class="gut">13</div>
+        <div class="cell" data-ref="A13" data-fx="Year-4 dividend (D&#8324;)"><span class="lab">Year-4 dividend (D&#8324;)</span></div>
+        <div class="cell v" data-ref="B13" data-fx="=B11*(1+$B$5)"><span class="val">$1.80</span></div>
+        <div class="cell" data-ref="C13" data-fx=""></div>
+
+        <!-- 14 -->
+        <div class="gut">14</div>
+        <div class="cell" data-ref="A14" data-fx="Terminal value at end of Year 3"><span class="lab">Terminal value at end of Year 3</span></div>
+        <div class="cell v" data-ref="B14" data-fx="=B13/($B$6-$B$5)"><span class="val">$22.46</span></div>
+        <div class="cell" data-ref="C14" data-fx=""></div>
+
+        <!-- 15 -->
+        <div class="gut">15</div>
+        <div class="cell" data-ref="A15" data-fx="PV of terminal value"><span class="lab">PV of terminal value</span></div>
+        <div class="cell v" data-ref="B15" data-fx="=-PV($B$6,$B$4,0,B14)"><span class="val">$15.99</span></div>
+        <div class="cell" data-ref="C15" data-fx=""></div>
+
+        <!-- 16 -->
+        <div class="gut">16</div>
+        <div class="section" data-ref="A16" data-fx="Intrinsic value">Intrinsic value</div>
+
+        <!-- 17 -->
+        <div class="gut">17</div>
+        <div class="cell" data-ref="A17" data-fx="PV of dividends, Years 1&ndash;3"><span class="lab">PV of dividends, Years 1&ndash;3</span></div>
+        <div class="cell v" data-ref="B17" data-fx="=SUM(C9:C11)"><span class="val">$3.45</span></div>
+        <div class="cell" data-ref="C17" data-fx=""></div>
+
+        <!-- 18 -->
+        <div class="gut">18</div>
+        <div class="cell answer" data-ref="A18" data-fx="Value per share"><span class="lab b">Value per share</span></div>
+        <div class="cell answer v" data-ref="B18" data-fx="=B17+B15"><span class="val">$19.44</span></div>
+        <div class="cell answer" data-ref="C18" data-fx=""></div>
+      </div>
+
+      <div class="note">
+        <div class="mk">!</div>
+        <p>The two stages: discount Years&nbsp;1&ndash;3 individually with <code>PV()</code>, then capitalize the matured 4%-forever stream at Year&nbsp;3 using <code>D&#8324; &divide; (r &minus; g&#8322;)</code> and discount that lump back. Add the two pieces &mdash; <b>Value per share = $19.44.</b></p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    var nameBox = document.getElementById('namebox');
+    var formula = document.getElementById('formula');
+    var selchip = document.getElementById('selchip');
+    var copybtn = document.getElementById('copybtn');
+    var cells = document.querySelectorAll('[data-ref]');
+
+    function select(c){
+      cells.forEach(function(x){ x.classList.remove('selected'); });
+      c.classList.add('selected');
+      var ref = c.getAttribute('data-ref');
+      nameBox.textContent = ref;
+      formula.innerHTML = c.getAttribute('data-fx') || '';
+      selchip.textContent = ref + ' selected';
+    }
+    cells.forEach(function(c){ c.addEventListener('click', function(){ select(c); }); });
+
+    function copyText(t){
+      try{ if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(t); return true; } }catch(e){}
+      try{ var ta=document.createElement('textarea'); ta.value=t; ta.style.position='fixed'; ta.style.opacity='0';
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); return true; }catch(e){ return false; }
+    }
+    copybtn.addEventListener('click', function(){
+      copyText(formula.textContent);
+      var prev = copybtn.textContent; copybtn.textContent = 'Copied';
+      setTimeout(function(){ copybtn.textContent = prev; }, 1100);
+    });
+
+    var def = document.querySelector('[data-ref="B18"]');
+    if(def) select(def);
+  })();
+</script>
