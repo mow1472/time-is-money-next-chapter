@@ -1,0 +1,95 @@
+<!-- EYARC-styled graphic — dividend discount (Gordon growth) model -->
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;1,600;1,700;1,800&display=swap');
+  :root{
+    --navy:#002E5D; --blue:#0d65c7; --lightblue:#B5E2FA;
+    --yellow:#FFE600; --gold:#F2BA05;
+    --gray1:#EAEAF1; --gray2:#C2C2CE; --gray3:#747480;
+    --sans:'Open Sans', Arial, sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:var(--sans); background:#F2F3F7; color:var(--navy);
+    display:flex; justify-content:center; padding:40px 24px; min-height:100vh; }
+  .wrap{ width:100%; max-width:760px; }
+  .frame{ border:1px solid #000; border-radius:14px; overflow:hidden; background:#fff;
+    box-shadow:0 18px 40px -18px rgba(0,46,93,.55); }
+  .bar{ padding:16px 22px; background:var(--navy); border-bottom:3px solid var(--yellow);
+    display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+  .bar h1{ font-weight:800; font-size:16px; color:#fff; letter-spacing:.3px; }
+  .bar .sub{ font-size:12px; font-weight:600; color:var(--lightblue); }
+
+  /* formula panel */
+  .formulawrap{ padding:30px 24px 26px; display:flex; justify-content:center; }
+  .formula{ display:flex; align-items:center; gap:20px; font-size:44px; font-weight:800; line-height:1; }
+  .v{ font-style:italic; }
+  .v sub{ font-size:.5em; font-weight:700; font-style:normal; }
+  .p{ color:var(--navy); } .d{ color:var(--gold); } .r{ color:var(--blue); } .g{ color:var(--gray3); }
+  .eq{ color:var(--navy); font-weight:400; }
+  .frac{ display:inline-flex; flex-direction:column; align-items:center; }
+  .frac .num{ padding:0 18px 8px; }
+  .frac .den{ padding:8px 18px 0; border-top:3px solid var(--navy); }
+  .paren{ color:var(--navy); font-weight:400; font-style:normal; }
+
+  /* callouts */
+  .callouts{ padding:4px 26px 14px; }
+  .crow{ display:flex; gap:14px; align-items:baseline; padding:11px 0; border-top:1px solid var(--gray1); }
+  .crow:first-child{ border-top:none; }
+  .chip{ flex:none; min-width:48px; text-align:center; font-style:italic; font-weight:800; font-size:18px;
+    padding:5px 0; border-radius:8px; }
+  .chip sub{ font-size:.55em; font-weight:700; font-style:normal; }
+  .chip.p{ color:var(--navy); background:var(--gray1); }
+  .chip.d{ color:#9a7400; background:rgba(242,186,5,.16); }
+  .chip.r{ color:var(--blue); background:rgba(13,101,199,.12); }
+  .chip.g{ color:var(--gray3); background:rgba(116,116,128,.12); }
+  .ctext{ font-size:13.5px; line-height:1.5; color:var(--navy); padding-top:5px; }
+  .ctext b{ font-weight:700; }
+  .ctext .mono{ font-family:'Open Sans'; font-style:italic; font-weight:700; }
+
+  .note{ padding:4px 26px 18px; }
+  .note p{ font-size:12.5px; line-height:1.5; color:var(--gray3); font-weight:300; text-align:center; }
+  .note p b{ font-weight:600; color:var(--gray3); }
+</style>
+
+<div class="wrap">
+  <div class="frame">
+    <div class="bar">
+      <h1>The Dividend Discount Model</h1>
+      <div class="sub">Gordon growth &mdash; a stock&rsquo;s value from its dividends</div>
+    </div>
+
+    <div class="formulawrap">
+      <div class="formula">
+        <span class="v p">P</span>
+        <span class="eq">=</span>
+        <span class="frac">
+          <span class="num"><span class="v d">D</span><sub>1</sub></span>
+          <span class="den"><span class="paren">(</span><span class="v r">r</span> <span class="paren">&minus;</span> <span class="v g">g</span><span class="paren">)</span></span>
+        </span>
+      </div>
+    </div>
+
+    <div class="callouts">
+      <div class="crow">
+        <div class="chip p">P</div>
+        <div class="ctext"><b>Stock price today</b> &mdash; what you&rsquo;re solving for.</div>
+      </div>
+      <div class="crow">
+        <div class="chip d">D<sub>1</sub></div>
+        <div class="ctext"><b>Next year&rsquo;s dividend</b> &mdash; <span class="mono">D<sub>0</sub> &times; (1 + g)</span>, this year&rsquo;s dividend grown one year.</div>
+      </div>
+      <div class="crow">
+        <div class="chip r">r</div>
+        <div class="ctext"><b>Required return</b> &mdash; your minimum acceptable return given the stock&rsquo;s risk.</div>
+      </div>
+      <div class="crow">
+        <div class="chip g">g</div>
+        <div class="ctext"><b>Constant dividend growth rate</b> &mdash; assumed to continue forever.</div>
+      </div>
+    </div>
+
+    <div class="note">
+      <p>Works only when <b>r &gt; g</b> &mdash; the required return must exceed the growth rate, or the price has no finite value.</p>
+    </div>
+  </div>
+</div>
