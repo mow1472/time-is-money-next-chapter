@@ -1,0 +1,126 @@
+<!-- EYARC-styled graphic — HP 10bII+ DEFERRED uneven cash flows, keystroke table -->
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400;1,500&display=swap');
+  :root{
+    --navy:#002E5D; --navy2:#013A76;
+    --yellow:#FFE600; --gold:#F2BA05; --lightblue:#B5E2FA;
+    --muted:#7E93B0; --line:rgba(255,255,255,.10);
+    --mono:'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+    --sans:'Open Sans', Arial, sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:var(--sans); background:#F2F3F7;
+    display:flex; justify-content:center; padding:40px 24px; min-height:100vh; }
+  .card{ width:100%; max-width:660px; background:var(--navy);
+    background-image:linear-gradient(160deg,#013A76 0%,#002E5D 55%,#00264D 100%);
+    border-radius:14px; padding:26px 30px 28px;
+    box-shadow:0 18px 44px -18px rgba(0,46,93,.6); }
+
+  .title{ color:#fff; font-weight:800; font-size:17px; letter-spacing:.2px; }
+  .rule{ height:3px; background:var(--yellow); border-radius:2px; margin:13px 0 20px; }
+
+  .grid{ display:grid; grid-template-columns:200px 1fr; column-gap:22px; }
+  .head{ font-size:10.5px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase;
+    color:var(--muted); padding-bottom:12px; }
+
+  .row{ display:contents; }
+  .ks, .why{ padding:9px 0; border-top:1px solid var(--line); display:flex; align-items:center; }
+  .ks{ font-family:var(--mono); font-size:13.5px; }
+  .v{ display:inline-block; width:62px; text-align:right; color:#fff; font-weight:500; padding-right:14px; }
+  .k{ color:var(--yellow); font-weight:700; letter-spacing:.3px; }
+  .sh{ color:var(--gold); font-weight:700; margin-right:5px; }
+  .why{ font-family:var(--mono); font-style:italic; font-size:12.5px; color:var(--lightblue); line-height:1.4; }
+
+  /* empty-year rows — the deferral */
+  .row.gap .ks, .row.gap .why{ background:rgba(255,230,0,.07); }
+  .row.gap .why{ color:#FFE600; }
+
+  /* result */
+  .row.result .ks, .row.result .why{ border-top:1px solid rgba(255,230,0,.4); padding-top:13px; }
+  .row.result .why{ font-style:normal; color:var(--yellow); font-weight:700; font-size:15px; }
+
+  .foot{ margin-top:20px; font-family:var(--mono); font-size:11px; font-style:italic;
+    color:var(--muted); line-height:1.5; }
+  .foot b{ color:var(--lightblue); font-style:normal; }
+
+  @media (max-width:540px){
+    .grid{ grid-template-columns:1fr; column-gap:0; }
+    .head.h2, .why{ padding-left:0; }
+    .head.h2{ display:none; }
+    .why{ border-top:none; padding-top:0; padding-bottom:14px; padding-left:62px; }
+    .row.result .why{ border-top:none; }
+  }
+</style>
+
+<div class="card">
+  <div class="title">NPV from Deferred Uneven Cash Flows &mdash; HP 10bII+</div>
+  <div class="rule"></div>
+
+  <div class="grid">
+    <div class="head h1">Keystrokes</div>
+    <div class="head h2">What you see / why</div>
+
+    <div class="row">
+      <div class="ks"><span class="v"></span><span class="k"><span class="sh">&#9670;</span>C ALL</span></div>
+      <div class="why">clears all registers</div>
+    </div>
+
+    <div class="row">
+      <div class="ks"><span class="v">0</span><span class="k">CFj</span></div>
+      <div class="why">CF0 = 0 (nothing received today)</div>
+    </div>
+
+    <div class="row gap">
+      <div class="ks"><span class="v">0</span><span class="k">CFj</span></div>
+      <div class="why">CF1 = 0 (the deferred, empty years)</div>
+    </div>
+
+    <div class="row gap">
+      <div class="ks"><span class="v">2</span><span class="k"><span class="sh">&#9670;</span>Nj</span></div>
+      <div class="why">N1 = 2 (Years 1&ndash;2 both empty)</div>
+    </div>
+
+    <div class="row">
+      <div class="ks"><span class="v">4000</span><span class="k">CFj</span></div>
+      <div class="why">CF2 = 4,000 (Year 3)</div>
+    </div>
+
+    <div class="row">
+      <div class="ks"><span class="v">1</span><span class="k"><span class="sh">&#9670;</span>Nj</span></div>
+      <div class="why">N2 = 1</div>
+    </div>
+
+    <div class="row">
+      <div class="ks"><span class="v">6000</span><span class="k">CFj</span></div>
+      <div class="why">CF3 = 6,000 (Year 4)</div>
+    </div>
+
+    <div class="row">
+      <div class="ks"><span class="v">1</span><span class="k"><span class="sh">&#9670;</span>Nj</span></div>
+      <div class="why">N3 = 1</div>
+    </div>
+
+    <div class="row">
+      <div class="ks"><span class="v">8000</span><span class="k">CFj</span></div>
+      <div class="why">CF4 = 8,000 (Year 5)</div>
+    </div>
+
+    <div class="row">
+      <div class="ks"><span class="v">1</span><span class="k"><span class="sh">&#9670;</span>Nj</span></div>
+      <div class="why">N4 = 1</div>
+    </div>
+
+    <div class="row">
+      <div class="ks"><span class="v">7</span><span class="k">I/YR</span></div>
+      <div class="why">I/YR = 7%</div>
+    </div>
+
+    <div class="row result">
+      <div class="ks"><span class="v"></span><span class="k"><span class="sh">&#9670;</span>NPV</span></div>
+      <div class="why">NPV = 13,546.45 (value today)</div>
+    </div>
+  </div>
+
+  <div class="foot">Front-loading the empty years with <b>0 CFj</b> keeps the register discounting from today &mdash; so <b>&#9670; NPV</b> lands the present value in one pass, with no second discount step.</div>
+</div>
