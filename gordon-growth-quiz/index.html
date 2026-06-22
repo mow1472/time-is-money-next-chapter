@@ -1,0 +1,231 @@
+<!-- EYARC-styled interactive practice — dividend discount (Gordon growth) -->
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;0,800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+  :root{
+    --navy:#002E5D; --blue:#0d65c7; --lightblue:#B5E2FA;
+    --yellow:#FFE600; --gold:#F2BA05; --green:#6E9600;
+    --gray1:#EAEAF1; --gray2:#C2C2CE; --gray3:#747480;
+    --mono:'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+    --sans:'Open Sans', Arial, sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:var(--sans); background:#F2F3F7; color:var(--navy);
+    display:flex; justify-content:center; padding:40px 24px; min-height:100vh; }
+  .wrap{ width:100%; max-width:780px; }
+  .frame{ border:1px solid #000; border-radius:14px; overflow:hidden; background:#fff;
+    box-shadow:0 18px 40px -18px rgba(0,46,93,.55); }
+  .bar{ padding:18px 24px; background:var(--navy); border-bottom:3px solid var(--yellow);
+    display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .bar h1{ font-weight:800; font-size:17px; color:#fff; letter-spacing:.3px; }
+  .meta{ display:flex; align-items:center; gap:14px; }
+  .counter{ font-family:var(--mono); font-size:12px; font-weight:700; color:var(--navy);
+    background:var(--yellow); padding:5px 12px; border-radius:20px; white-space:nowrap; }
+  .dots{ display:flex; gap:7px; }
+  .dot{ width:9px; height:9px; border-radius:50%; background:rgba(255,255,255,.30); transition:.2s; }
+  .dot.solved{ background:var(--green); }
+  .dot.current{ box-shadow:0 0 0 3px rgba(255,230,0,.40); background:var(--yellow); }
+  .dot.current.solved{ background:var(--green); }
+
+  .body{ padding:8px 24px 22px; }
+  .q{ display:none; }
+  .q.active{ display:block; animation:pop .32s ease; }
+  @keyframes pop{ from{opacity:0; transform:translateY(10px) scale(.99);} to{opacity:1; transform:translateY(0) scale(1);} }
+  .q .qhead{ display:flex; gap:12px; align-items:baseline; margin-top:18px; }
+  .q .num{ flex:none; width:28px; height:28px; border-radius:8px; background:var(--navy); color:#fff;
+    font-weight:800; font-size:14px; display:flex; align-items:center; justify-content:center; transform:translateY(2px); }
+  .q.solved .num{ background:var(--green); }
+  .q .prompt{ font-size:14.5px; line-height:1.55; }
+
+  .answer{ display:flex; gap:10px; align-items:center; margin-top:16px; flex-wrap:wrap; }
+  .answer .pre{ font-weight:700; font-size:13px; color:var(--gray3); }
+  .answer input{ font-family:var(--mono); font-size:14px; font-weight:500; color:var(--navy);
+    padding:9px 12px; border:1.5px solid var(--gray2); border-radius:8px; width:160px; outline:none; transition:border-color .15s; }
+  .answer input:focus{ border-color:var(--blue); }
+  .answer input.ok{ border-color:var(--green); background:rgba(110,150,0,.06); }
+  .answer input.bad{ border-color:#F84725; background:rgba(248,71,37,.05); }
+  button.check{ font-family:var(--sans); font-weight:700; font-size:13px; color:#fff; background:var(--blue);
+    border:none; cursor:pointer; padding:9px 18px; border-radius:8px; transition:background .15s, transform .05s; }
+  button.check:hover{ background:#0a52a3; } button.check:active{ transform:translateY(1px); }
+  .feedback{ font-size:13px; font-weight:700; margin-left:2px; min-height:18px; }
+  .feedback.ok{ color:var(--green); } .feedback.bad{ color:#F84725; }
+
+  .panel{ display:none; margin-top:12px; padding:13px 15px; border-radius:10px; font-size:13px; line-height:1.55; }
+  .panel.show{ display:block; animation:slide .25s ease; }
+  @keyframes slide{ from{opacity:0; transform:translateY(-4px);} to{opacity:1; transform:translateY(0);} }
+  .panel.t1{ background:rgba(181,226,250,.35); border-left:4px solid var(--blue); }
+  .panel.t2{ background:rgba(255,230,0,.14); border-left:4px solid var(--gold); }
+  .panel.reveal{ background:var(--navy); border-left:4px solid var(--yellow); color:#fff; }
+  .panel .tag{ font-weight:800; font-size:11px; letter-spacing:.6px; text-transform:uppercase; display:block; margin-bottom:5px; }
+  .panel.t1 .tag{ color:var(--blue); } .panel.t2 .tag{ color:#9a7400; } .panel.reveal .tag{ color:var(--yellow); }
+  .panel code{ font-family:var(--mono); font-size:12px; background:rgba(0,46,93,.06); padding:1px 5px; border-radius:4px; }
+  .reveal .amt{ font-family:var(--mono); font-weight:700; font-size:22px; color:var(--yellow); }
+  .reveal .why{ font-family:var(--mono); font-size:12.5px; color:var(--lightblue); margin-top:6px; line-height:1.5; }
+  .reveal .excel{ display:flex; align-items:center; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .reveal .excel .lab{ font-size:11px; font-weight:700; color:var(--gray2); }
+  .reveal .excel code{ background:rgba(255,255,255,.12); color:#fff; }
+  .reveal .cbtn{ font-family:var(--sans); font-size:10px; font-weight:700; cursor:pointer; color:var(--navy);
+    background:var(--yellow); border:none; padding:4px 9px; border-radius:5px; }
+  .reveal .cbtn.done{ background:var(--green); color:#fff; }
+
+  .nextwrap{ display:none; margin-top:16px; }
+  .nextwrap.show{ display:block; animation:slide .25s ease; }
+  button.next{ font-family:var(--sans); font-weight:800; font-size:13px; color:var(--navy); background:var(--yellow);
+    border:none; cursor:pointer; padding:10px 20px; border-radius:8px; transition:background .15s, transform .05s; }
+  button.next:hover{ background:var(--gold); } button.next:active{ transform:translateY(1px); }
+
+  #finish{ display:none; text-align:center; padding:34px 20px 26px; }
+  #finish.show{ display:block; animation:pop .32s ease; }
+  #finish h2{ font-size:22px; font-weight:800; color:var(--navy); }
+  #finish .score{ font-family:var(--mono); font-size:40px; font-weight:700; color:var(--green); margin:10px 0 4px; }
+  #finish p{ font-size:13px; color:var(--gray3); margin-bottom:18px; }
+  button.restart{ font-family:var(--sans); font-weight:700; font-size:13px; color:#fff; background:var(--navy);
+    border:none; cursor:pointer; padding:10px 22px; border-radius:8px; }
+  button.restart:hover{ background:#013a76; }
+
+  .note{ display:flex; gap:12px; align-items:flex-start; margin-top:22px; padding:14px 16px;
+    background:rgba(181,226,250,.30); border-radius:10px; border-top:1px solid var(--gray1); }
+  .note .mark{ flex:none; width:26px; height:26px; border-radius:6px; background:var(--yellow); color:var(--navy);
+    font-weight:800; font-size:15px; display:flex; align-items:center; justify-content:center; margin-top:1px; }
+  .note p{ font-size:12.5px; line-height:1.5; }
+  .note code{ font-family:var(--mono); font-size:11.5px; background:#fff; border:1px solid var(--gray2); padding:1px 5px; border-radius:4px; }
+</style>
+
+<div class="wrap">
+  <div class="frame">
+    <div class="bar">
+      <h1>Dividend Discount Model &mdash; Practice</h1>
+      <div class="meta">
+        <div class="dots" id="dots"></div>
+        <div class="counter" id="counter">Q1 of 5</div>
+      </div>
+    </div>
+    <div class="body">
+      <div id="quiz"></div>
+      <div id="finish">
+        <h2>Nice work!</h2>
+        <div class="score" id="score">0 / 5</div>
+        <button class="restart" onclick="restart()">Start over</button>
+      </div>
+      <div class="note" id="note">
+        <div class="mark">!</div>
+        <p>Grow the dividend one year first (<code>D&#8321; = D&#8320; &times; (1 + g)</code>), then apply <code>P = D&#8321; &divide; (r &minus; g)</code>. Answers accept <code>$34,257.82</code> or <code>34257.82</code> &mdash; dollar sign and commas optional.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var QUESTIONS = [
+    {
+      prompt:"A company just paid a dividend of $1.80 per share (that&rsquo;s D&#8320;). Dividends are expected to grow at 4% per year indefinitely, and an investor requires a 9% return. What should the investor pay for the stock today?",
+      h1:"Grow the dividend one year first, then apply <code>P = D&#8321; &divide; (r &minus; g)</code>.",
+      h2:"<code>D&#8321; = $1.80 &times; 1.04 = $1.872</code>; r = 0.09, g = 0.04.",
+      why:"$1.872 \u00f7 (0.09 \u2212 0.04) = $1.872 \u00f7 0.05 = $37.44",
+      excel:"=1.80*1.04/(0.09-0.04)", answer:37.44
+    },
+    {
+      prompt:"A utility just paid a $3.00 dividend (D&#8320;), expected to grow 5% per year forever. If investors require an 11% return, what is the stock worth today?",
+      h1:"Grow the dividend one year first, then apply <code>P = D&#8321; &divide; (r &minus; g)</code>.",
+      h2:"<code>D&#8321; = $3.00 &times; 1.05 = $3.15</code>; r = 0.11, g = 0.05.",
+      why:"$3.15 \u00f7 (0.11 \u2212 0.05) = $3.15 \u00f7 0.06 = $52.50",
+      excel:"=3.00*1.05/(0.11-0.05)", answer:52.50
+    },
+    {
+      prompt:"A company paid a $2.50 dividend (D&#8320;) and expects 3% annual growth indefinitely. At an 8% required return, what should the stock sell for?",
+      h1:"Grow the dividend one year first, then apply <code>P = D&#8321; &divide; (r &minus; g)</code>.",
+      h2:"<code>D&#8321; = $2.50 &times; 1.03 = $2.575</code>; r = 0.08, g = 0.03.",
+      why:"$2.575 \u00f7 (0.08 \u2212 0.03) = $2.575 \u00f7 0.05 = $51.50",
+      excel:"=2.50*1.03/(0.08-0.03)", answer:51.50
+    },
+    {
+      prompt:"A firm just paid a $1.20 dividend (D&#8320;), growing 6% per year forever. With a 10% required return, what is the stock&rsquo;s value today?",
+      h1:"Grow the dividend one year first, then apply <code>P = D&#8321; &divide; (r &minus; g)</code>.",
+      h2:"<code>D&#8321; = $1.20 &times; 1.06 = $1.272</code>; r = 0.10, g = 0.06.",
+      why:"$1.272 \u00f7 (0.10 \u2212 0.06) = $1.272 \u00f7 0.04 = $31.80",
+      excel:"=1.20*1.06/(0.10-0.06)", answer:31.80
+    },
+    {
+      prompt:"A mature company paid a $4.00 dividend (D&#8320;), expected to grow 2.5% per year indefinitely. At a 7.5% required return, what is the stock worth?",
+      h1:"Grow the dividend one year first, then apply <code>P = D&#8321; &divide; (r &minus; g)</code>.",
+      h2:"<code>D&#8321; = $4.00 &times; 1.025 = $4.10</code>; r = 0.075, g = 0.025.",
+      why:"$4.10 \u00f7 (0.075 \u2212 0.025) = $4.10 \u00f7 0.05 = $82.00",
+      excel:"=4.00*1.025/(0.075-0.025)", answer:82.00
+    }
+  ];
+
+  var N=QUESTIONS.length, current=0;
+  var solved=new Array(N).fill(false), solvedClean=new Array(N).fill(false), attempts=new Array(N).fill(0);
+  function fmt(n){ return n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+  function copyText(text, btn){
+    var done=function(){ btn.textContent='Copied!'; btn.classList.add('done');
+      setTimeout(function(){ btn.textContent='Copy'; btn.classList.remove('done'); },1500); };
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(done).catch(fb); } else fb();
+    function fb(){ var ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select();
+      try{document.execCommand('copy'); done();}catch(e){} document.body.removeChild(ta); }
+  }
+
+  function buildDots(){ var d=document.getElementById('dots'); d.innerHTML='';
+    for(var k=0;k<N;k++){ var s=document.createElement('span'); s.className='dot'; s.id='dot'+k; d.appendChild(s); } }
+  function updateDots(){ for(var k=0;k<N;k++){ var el=document.getElementById('dot'+k); el.className='dot';
+      if(solved[k]) el.classList.add('solved'); if(k===current) el.classList.add('current'); }
+    document.getElementById('counter').textContent='Q'+(current+1)+' of '+N; }
+
+  function showPanel(i,t){ document.querySelector('#q'+i+' .panel.'+t).classList.add('show'); }
+  function showNext(i){ var w=document.querySelector('#q'+i+' .nextwrap'); w.classList.add('show');
+    w.querySelector('button.next').textContent=(i===N-1)?'See results':'Next question \u2192'; }
+
+  function check(i){
+    var card=document.getElementById('q'+i), input=card.querySelector('input'), fb=card.querySelector('.feedback');
+    var raw=input.value.replace(/[$,\s]/g,'');
+    if(raw===''){ fb.className='feedback bad'; fb.textContent='Enter an amount first.'; input.className=''; return; }
+    var val=parseFloat(raw);
+    if(isNaN(val)){ fb.className='feedback bad'; fb.textContent='That doesn\u2019t look like a number.'; input.className='bad'; return; }
+    if(Math.abs(val-QUESTIONS[i].answer)<=0.5){
+      fb.className='feedback ok'; fb.textContent='\u2713 Correct \u2014 $'+fmt(QUESTIONS[i].answer);
+      input.className='ok'; card.classList.add('solved');
+      if(!solved[i] && attempts[i]<3) solvedClean[i]=true;
+      solved[i]=true; updateDots(); showNext(i);
+    } else {
+      attempts[i]++; input.className='bad';
+      if(attempts[i]===1){ showPanel(i,'t1'); fb.className='feedback bad'; fb.textContent='Not quite \u2014 here\u2019s a hint.'; }
+      else if(attempts[i]===2){ showPanel(i,'t2'); fb.className='feedback bad'; fb.textContent='Still off \u2014 try this.'; }
+      else { showPanel(i,'reveal'); fb.className='feedback bad'; fb.textContent='Here\u2019s the answer \u2014 enter it to continue.'; }
+    }
+  }
+  function next(i){ document.getElementById('q'+i).classList.remove('active');
+    if(i===N-1){ finish(); return; }
+    current=i+1; var card=document.getElementById('q'+current); card.classList.add('active'); updateDots();
+    var inp=card.querySelector('input'); if(inp) setTimeout(function(){ inp.focus(); },50); }
+  function finish(){ var clean=solvedClean.filter(Boolean).length;
+    document.getElementById('score').textContent=clean+' / '+N;
+    document.getElementById('note').style.display='none';
+    document.getElementById('finish').classList.add('show'); }
+  function restart(){ current=0; solved.fill(false); solvedClean.fill(false); attempts.fill(0);
+    document.getElementById('finish').classList.remove('show');
+    document.getElementById('note').style.display='';
+    render(); updateDots();
+    document.getElementById('q0').classList.add('active'); }
+
+  function render(){
+    var host=document.getElementById('quiz'); host.innerHTML='';
+    QUESTIONS.forEach(function(q,i){
+      var card=document.createElement('div'); card.className='q'; card.id='q'+i;
+      card.innerHTML=
+        '<div class="qhead"><div class="num">'+(i+1)+'</div><div class="prompt">'+q.prompt+'</div></div>'+
+        '<div class="answer"><span class="pre">Stock price:</span>'+
+          '<input type="text" inputmode="decimal" placeholder="$0.00" onkeydown="if(event.key===\'Enter\')check('+i+')">'+
+          '<button class="check" onclick="check('+i+')">Check</button><span class="feedback"></span></div>'+
+        '<div class="panel t1"><span class="tag">Hint 1</span>'+q.h1+'</div>'+
+        '<div class="panel t2"><span class="tag">Hint 2</span>'+q.h2+'</div>'+
+        '<div class="panel reveal"><span class="tag">Answer</span>'+
+          '<span class="amt">$'+fmt(q.answer)+'</span><div class="why">'+q.why+'</div>'+
+          '<div class="excel"><span class="lab">In Excel:</span><code>'+q.excel+'</code>'+
+          '<button class="cbtn" onclick="copyText(\''+q.excel+'\', this)">Copy</button></div></div>'+
+        '<div class="nextwrap"><button class="next" onclick="next('+i+')">Next question \u2192</button></div>';
+      host.appendChild(card);
+    });
+  }
+  buildDots(); render(); document.getElementById('q0').classList.add('active'); updateDots();
+</script>
